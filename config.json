@@ -1,0 +1,9 @@
+{
+    "DB": {
+        "host": "database-splitwise.czv9ypsshxo3.us-east-2.rds.amazonaws.com",
+        "username": "admin",
+        "password": "Splitwise",
+        "port": 3306,
+        "database": "splitwise_db"
+    }
+}
