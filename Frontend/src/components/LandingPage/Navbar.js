@@ -2,6 +2,8 @@ import React,{Component} from 'react';
 import {Link} from 'react-router-dom';
 import cookie from 'react-cookies';
 import {Redirect} from 'react-router';
+import { Button, Col, Container, Row } from 'react-bootstrap';
+import logoSplitwise from '../../images/logo.png';
 
 class Navbar extends Component {
     constructor(props){
@@ -38,17 +40,24 @@ class Navbar extends Component {
         return(
             <div>
                 {redirectVar}
-            <nav class="navbar navbar-inverse">
-                <div class="container-fluid">
-                    <div class="navbar-header">
-                        <a class="navbar-brand">Splitwise</a>
-                    </div>
-                    <ul class="nav navbar-nav" id="landingPage">
-                        <li class="active"><Link to="/home">Home</Link></li>
-                    </ul>
-                    {navLogin}
-                </div>
-            </nav>
+                <Container>
+                <Row>
+                        <Col > 
+                            <a href="/" className="flex items-center">
+                                <img src={logoSplitwise} alt="Splitwise Logo" style={{ height: '100%', width: '100%' }} />
+                            </a>
+                        </Col>
+                        <Col></Col>
+                        <Col></Col>
+                        <Col></Col>
+                        <Col>
+                            <Button variant="outline-success" href="/login" style={{margin:'1rem'}}>Log In</Button>
+                        </Col>
+                        <Col> 
+                            <Button variant="success" href="/signup" style={{margin:'1rem'}}>Sign Up</Button>
+                        </Col>
+                    </Row>
+                </Container>
         </div>
         )
     }

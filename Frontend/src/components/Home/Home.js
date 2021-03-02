@@ -7,13 +7,14 @@ class Home extends Component {
     
     render(){
         //if not logged in go to login page
-        let redirectVar = null;
-        if(!cookie.load('cookie')){
-            redirectVar = <Redirect to= "/login"/>
-        }
+        // let redirectVar = null;
+        // if(!cookie.load('cookie')){
+        //     redirectVar = <Redirect to= "/login"/>
+        // }
         return(
             <div>
-                {redirectVar}
+                {/* {redirectVar} */}
+                welcome to home
             </div> 
         )
     }
