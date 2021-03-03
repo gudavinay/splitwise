@@ -66,7 +66,7 @@ app.post('/login', async function (req, res) {
     if (req.body.email && req.body.password) {
         console.log(`select rec_id, password from user_profile_table where UPPER(email) = '${req.body.email.toUpperCase()}' 
         AND password = '${passwordHash.generate(req.body.password)}'`);
-        await connection.query(`select rec_id, password from user_profile_table where UPPER(email) = '${req.body.email.toUpperCase()}'`, (err, result) => {
+        await connection.query(`select * from user_profile_table where UPPER(email) = '${req.body.email.toUpperCase()}'`, (err, result) => {
             console.log("XXXXXXXX", err, result);
             if (err) {
                 res.writeHead(500, {
@@ -74,15 +74,26 @@ app.post('/login', async function (req, res) {
                 });
                 res.send("Database Error");
             } else {
-                if (passwordHash.verify(req.body.password, result[0]['password'])) {
+                console.log("result[0]",result[0]);
+                if (result[0] && passwordHash.verify(req.body.password, result[0]['password'])) {
                     console.log("match");
                     res.writeHead(200, {
                         'Content-Type': 'text/plain'
                     })
-                    res.end("Successful Login");
+                    const userObj = {
+                        id: result[0]['rec_id'],
+                        email: result[0]['email'],
+                        name: result[0]['name'],
+                        profilePicture: result[0]['profile_picture_url'],
+                        phone: result[0]['phone'],
+                        currency: result[0]['currency'],
+                        timezone: result[0]['timezone'],
+                        language: result[0]['language']
+                    }
+                    res.end(JSON.stringify(userObj));
                 } else {
                     console.log("dont match");
-                    res.writeHead(401, {
+                    res.writeHead(200, {
                         'Content-Type': 'text/plain'
                     })
                     res.end("Unscuccessful Login");

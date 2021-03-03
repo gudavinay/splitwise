@@ -22,36 +22,42 @@ class Login extends Component {
   }
 
 
-    onSubmit = (event) => {
+    onSubmit =async  (event) => {
         event.preventDefault();
         const data = {
             email: this.state.email,
             password: this.state.password
         };
-        this.props.loginRedux(data);
-        
-        // Axios.post(`${backendServer}/login`, data)
-        // .then(response => {
-        //     console.log("response recieved from login req", response);
-        // })
-        // .catch(error => {
-        //     console.log("error recieved from login req", error);
-        // });
+        await this.props.loginRedux(data);
+        this.setState({
+            loginClicked: true
+        })
     }
 
     render() {
-        let redirectVar = null;
+        let redirectVar,message = null;
         if (cookie.load('cookie')) {
             redirectVar = <Redirect to="/home" />
         }
         console.log("******************************");
         console.log(this.props);
         console.log("******************************");
+
+        if (this.state.loginClicked) {
+            if (this.props.user && this.props.user.id) {
+                localStorage.setItem("userProfile", JSON.stringify(this.props.user));
+                redirectVar = <Redirect to="/home/s/dashboard" />
+            } else {
+                message = "Whoops! We couldn't find an account for that email address and password. Maybe try again.";
+            }
+        }
+
         return (
             <div>
                 {redirectVar}
                 <Navbar />
                 <Container>
+                    <Row style={{color: 'indianred',marginLeft:'12rem'}}>{message}</Row>
                     <Row>
                         <Col>
                             <img src={logoSmall} alt="logo" style={{ height: '70%', width: '70%', margin: '6rem' }} />
