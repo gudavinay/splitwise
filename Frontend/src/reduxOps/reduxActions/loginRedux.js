@@ -1,6 +1,6 @@
 import Axios from "axios";
 import backendServer from '../../webConfig';
-import { LOGIN, ERROR } from "../types";
+import { LOGIN, ERROR, LOGOUT } from "../types";
 export const loginRedux = (data) => async dispatch => { 
     await Axios.post(`${backendServer}/login`, data)
         .then(response => {
@@ -18,3 +18,6 @@ export const loginRedux = (data) => async dispatch => {
             })
         });
 }
+
+
+export const logoutRedux = () => dispatch => dispatch({type: LOGOUT});

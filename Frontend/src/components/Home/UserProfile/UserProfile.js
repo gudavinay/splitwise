@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
-import { Col, Container, Dropdown, Row } from 'react-bootstrap';
-import store from '../../../store'
+import { Col, Container, Row } from 'react-bootstrap';
+// import store from '../../../store'
 
 class UserProfile extends Component {
     constructor(props) {
         super(props);
+        this.state={
+
+        }
     }
     render() {
         // const state = store.getState();
@@ -19,7 +22,7 @@ class UserProfile extends Component {
                         <Col >
                             <center>
                                 <h2>Your account</h2>
-                                <img src="https://png.pngtree.com/png-vector/20191023/ourlarge/pngtree-user-vector-icon-with-white-background-png-image_1849343.jpg" style={{ height: '100%', width: '100%' }} alt="profile picture"></img>
+                                <img src="https://png.pngtree.com/png-vector/20191023/ourlarge/pngtree-user-vector-icon-with-white-background-png-image_1849343.jpg" style={{ height: '100%', width: '100%' }} alt="profilephoto"/>
                             </center>
                         </Col>
                         <Col style={{ marginTop: '5rem' }}>
@@ -49,7 +52,6 @@ class UserProfile extends Component {
                                 Your default currency
                             </Row>
                             <Row>
-                                {/* <input value={userProfileJSON.currency} /> */}
                                 <select name="currency" id="currency" value={userProfileJSON.currency}>
                                     <option value="USD">USD ($)</option>
                                     <option value="KWD">KWD (KWD)</option>
@@ -154,7 +156,6 @@ class UserProfile extends Component {
                                 Language
                             </Row>
                             <Row>
-                                {/* <input value={userProfileJSON.language} /> */}
                                 <select name="language" id="language" value={userProfileJSON.language}>
                                     <option value="AF">Afrikaans</option>
                                     <option value="SQ">Albanian</option>

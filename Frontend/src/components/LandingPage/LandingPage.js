@@ -13,8 +13,8 @@ import { Redirect } from 'react-router';
 class LandingPage extends Component {
     render() {
         let redirectVar = null;
-        if (localStorage.getItem("user_id")) {
-            redirectVar = <Redirect to="/home" />
+        if (localStorage.getItem("userProfile")) {
+            redirectVar = <Redirect to="/home/s/dashboard" />
         }
         return (
             <div>

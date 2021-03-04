@@ -16,10 +16,6 @@ class Sidebar extends Component{
                             <Button variant="light" href="/home/s/dashboard">Dashboard</Button><br />
                             <Button variant="light" href="/home/s/recentActivities">Recent Activities</Button>
                         </Col>
-                        {/* <Col sm={9} style={{boxShadow:'-50px 0px 50px -30px '}}> */}
-                        {/* <Col sm={9}>
-                            <ElementToLoad data={this.state} />
-                        </Col> */}
                     </Row>
                 </Container>
             </div>

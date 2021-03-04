@@ -1,6 +1,5 @@
 import React, { Component }  from 'react';
 import '../../App.css';
-import cookie from 'react-cookies';
 import { Redirect } from 'react-router';
 import { Container, Row, Col } from 'react-bootstrap';
 import Navbar from '../LandingPage/Navbar';
@@ -39,8 +38,8 @@ class SignUp extends Component {
 
     render() {
         let redirectVar = null;
-        if (cookie.load('cookie')) {
-            redirectVar = <Redirect to="/" />
+        if (localStorage.getItem("userProfile")) {
+            redirectVar = <Redirect to="/home/s/dashboard" />
         }
         return (
             <div>

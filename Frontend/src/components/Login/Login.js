@@ -1,12 +1,9 @@
 import React, { Component }  from 'react';
 import '../../App.css';
-import cookie from 'react-cookies';
 import { Redirect } from 'react-router';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col, Alert } from 'react-bootstrap';
 import Navbar from '../LandingPage/Navbar';
 import logoSmall from '../../images/logoSmall.png';
-import Axios from 'axios';
-import backendServer from "../../webConfig";
 import { loginRedux } from '../../reduxOps/reduxActions/loginRedux';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -36,8 +33,8 @@ class Login extends Component {
 
     render() {
         let redirectVar,message = null;
-        if (cookie.load('cookie')) {
-            redirectVar = <Redirect to="/home" />
+        if (localStorage.getItem("userProfile")) {
+            redirectVar = <Redirect to="/home/s/dashboard" />
         }
         console.log("******************************");
         console.log(this.props);
@@ -57,7 +54,7 @@ class Login extends Component {
                 {redirectVar}
                 <Navbar />
                 <Container>
-                    <Row style={{color: 'indianred',marginLeft:'12rem'}}>{message}</Row>
+                    <Row style={{color: 'indianred',marginLeft:'12rem',display:message?'inline-block':'none'}}><Alert variant='danger'>{message}</Alert></Row>
                     <Row>
                         <Col>
                             <img src={logoSmall} alt="logo" style={{ height: '70%', width: '70%', margin: '6rem' }} />
