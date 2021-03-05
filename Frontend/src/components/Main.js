@@ -9,6 +9,7 @@ import { Col, Container, Row } from 'react-bootstrap';
 import Sidebar from './Home/Sidebar/Sidebar';
 import RecentActivities from './Home/RecentActivities/RecentActivities';
 import UserProfile from './Home/UserProfile/UserProfile';
+import NewGroup from './Home/NewGroup/NewGroup';
 //Create a Main Component
 class Main extends Component {
     render() {
@@ -20,6 +21,7 @@ class Main extends Component {
                 <Route path="/signup" component={SignUp} />
                 <Route path="/home" component={Home} />
                 <Route path="/home/userProfile" component={UserProfile} />
+                <Route path="/home/newGroup" component={NewGroup} />
                 <Container>
                     <Row>
                         <Col sm={3} >
@@ -31,6 +33,7 @@ class Main extends Component {
                         </Col>
                     </Row>
                 </Container>
+                {/* <Route render={() => <Redirect to={{pathname: "/"}} />} /> */}
             </div>
         )
     }
