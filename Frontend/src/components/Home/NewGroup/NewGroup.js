@@ -4,7 +4,7 @@ import { Col, Container, Row, Glyphicon } from 'react-bootstrap';
 import Axios from 'axios';
 import backendServer from '../../../webConfig';
 import logoSmall from '../../../images/logoSmall.png';
-
+import '../../splitwise.css'
 
 class NewGroup extends Component {
     constructor(props) {
@@ -53,19 +53,22 @@ class NewGroup extends Component {
                 <Container>
                     <Row>
                         <Col>
-                            <img src={logoSmall} alt="logo" style={{ height: '70%', width: '70%', margin: '6rem' }} />
+                            <img src={logoSmall} alt="logo" style={{ height: '65%', width: '50%', margin: '6rem',marginLeft:'12rem' }} />
                         </Col>
                         <Col>
                             <Row>
-                                START A NEW GROUP
+                                <Col className='greytext'>START A NEW GROUP</Col>
                             </Row>
                             <Row>
-                                My group shall be called…
+                                <Col><br/><h4>My group shall be called…</h4></Col>
                             </Row>
                             <Row>
-                                <input type="text" onChange={(e) => { this.setState({ groupName: e.target.value }); this.setState({ open: true }) }} name="groupName" placeholder="Funkytown" required />
-                                {this.state.groupName}
+                                <Col>
+                                    <input type="text" style={{fontSize:'32px'}} onChange={(e) => { this.setState({ groupName: e.target.value }); this.setState({ open: true }) }} name="groupName" placeholder="Funkytown" required />
+                                </Col>
+                                {/* {this.state.groupName} */}
                             </Row>
+                            <hr/>
                             <Collapse in={this.state.open}>
                                 <div id="example-collapse-text">
                                     {/* <input type="text" list="cars" /> */}
@@ -81,18 +84,22 @@ class NewGroup extends Component {
                                     )}
                                     
   {[...Array(this.state.defaultCount)].map((el, index) => <option key={index}>Item</option>)} */}
-
                                     <Row>
-                                        <Col>
-                                            Name / Email Search
+                                        <Col className='greytext'>
+                                            GROUP MEMBERS
                                         </Col>
+                                    </Row>
+                                    <Row>
+                                        {/* <Col>
+                                            Name / Email Search
+                                        </Col> */}
                                         {/* <Col>
                                             Name Search
                                         </Col> */}
                                     </Row>
                                     <Row>
                                         <Col>
-                                            <input style={{width:'80%', marginRight:'10px'}} id="newGroupPersons" onChange={(e) => this.setState({ selected: e.target.value })} type="text" list="email" />
+                                            <input style={{width:'80%', marginRight:'10px'}} id="newGroupPersons" onChange={(e) => this.setState({ selected: e.target.value })} type="text" list="email" placeholder="Search with Name or Email address"/>
                                             <datalist onChange={(e) => console.log("onchange", e)} id="email">
                                                 {this.state.resp.map((element, index) =>
                                                     <option key={element.id} value={element.id}>{element.name} / {element.email}</option>
@@ -116,7 +123,7 @@ class NewGroup extends Component {
                                         </Col> */}
                                     </Row>
                                     <Row>
-                                        <ol style={{width:'80%'}}>
+                                        <ol style={{width:'80%', marginTop:'1rem'}}>
                                             {this.state.selectedList.map(user => (
                                                 <Row>
                                                     <Col sm={10}>
@@ -140,6 +147,14 @@ class NewGroup extends Component {
                                                 </Row>
                                             ))}
                                         </ol>
+                                    </Row>
+                                    <hr/>
+                                    <Row>
+                                        <Col>
+                                            <Button style={{ backgroundColor:'#FF6139' ,borderColor:'#FF6139'}} onClick={()=>{
+                                                console.log("save clicked");
+                                            }} >Save</Button>
+                                        </Col>
                                     </Row>
 
                                     {/* <ElementToLoad state={this.state}/> */}

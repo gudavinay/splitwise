@@ -22,7 +22,7 @@ class Main extends Component {
                 <Route path="/home" component={Home} />
                 <Route path="/home/userProfile" component={UserProfile} />
                 <Route path="/home/newGroup" component={NewGroup} />
-                <Container>
+                {/* <Container> */}
                     <Row>
                         <Col sm={3} >
                             <Route path="/home/s" component={Sidebar} />
@@ -32,7 +32,7 @@ class Main extends Component {
                             <Route path="/home/s/recentActivities" component={RecentActivities} />
                         </Col>
                     </Row>
-                </Container>
+                {/* </Container> */}
                 {/* <Route render={() => <Redirect to={{pathname: "/"}} />} /> */}
             </div>
         )

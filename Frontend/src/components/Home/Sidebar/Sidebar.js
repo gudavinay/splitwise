@@ -1,7 +1,7 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-
-class Sidebar extends Component{
+import '../../splitwise.css';
+class Sidebar extends Component {
     constructor(props) {
         super(props);
         this.state = {};
@@ -11,12 +11,14 @@ class Sidebar extends Component{
         return (
             <div>
                 <Container>
-                    <Row>
-                        <Col sm={3}>
-                            <Button variant="light" href="/home/s/dashboard">Dashboard</Button><br />
-                            <Button variant="light" href="/home/s/recentActivities">Recent Activities</Button>
-                        </Col>
-                    </Row>
+                    <div style={{paddingLeft:'45%'}}>
+                        <div className="sidebarItem">
+                            <a href="/home/s/dashboard" style={{ borderLeft: '6px solid #5bc5a7', color: '#5bc5a7', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none' }}>Dashboard</a><br />
+                        </div>
+                        <div className="sidebarItem">
+                            <a href="/home/s/recentActivities" style={{ borderLeft: '6px solid #5bc5a7', color: '#ff652f', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none' }}>Recent&nbsp;Activities</a>
+                        </div>
+                    </div>
                 </Container>
             </div>
         );

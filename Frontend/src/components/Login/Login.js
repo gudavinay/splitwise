@@ -57,10 +57,10 @@ class Login extends Component {
                     <Row style={{color: 'indianred',marginLeft:'12rem',display:message?'inline-block':'none'}}><Alert variant='danger'>{message}</Alert></Row>
                     <Row>
                         <Col>
-                            <img src={logoSmall} alt="logo" style={{ height: '70%', width: '70%', margin: '6rem' }} />
+                            <img src={logoSmall} alt="logo" style={{ height: '65%', width: '50%', margin: '6rem',marginLeft:'16rem' }} />
                         </Col>
                         <Col>
-                            <div style={{margin:'6rem'}}>
+                            <div style={{margin:'6rem', paddingTop:'4rem', paddingRight:'8rem',marginLeft:'2rem'}}>
                                 <div className="panel">
                                     <h2 style={{color: '#999' , fontWeight: 'bold'}}>WELCOME TO SPLITWISE</h2>
                                 </div><br />

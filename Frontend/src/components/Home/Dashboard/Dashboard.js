@@ -1,7 +1,7 @@
 import { Button, Modal } from 'react-bootstrap';
 import React, { Component } from 'react';
 import { Col, Container, Row} from 'react-bootstrap';
-import Axios from 'axios';
+import '../../splitwise.css'
 
 class Dashboard extends Component {
     constructor(props) {
@@ -14,7 +14,7 @@ class Dashboard extends Component {
             <div>
                 {/* {localStorage.getItem("userProfile")} */}
                 {/* I am in dashboard */}
-                <Container>
+                {/* <Container> */}
                     <Row>
                         <Col>
                            <h2><strong>Dashboard</strong></h2> 
@@ -26,21 +26,22 @@ class Dashboard extends Component {
                             <Button variant="success" href="/home/settle" style={{ backgroundColor:'#5bc5a7' ,borderColor:'#5bc5a7'}}>Settle up</Button>
                         </Col>
                     </Row>
+                    <hr/>
                     <Row>
                         <Col>
                             total balance<br/>
-                            <span style={{color:'#ff652f'}}>-$1496.74</span>
+                            <span style={{color:'#ff652f'}}>$0.00</span>
                         </Col>
-                        <Col>
+                        <Col style={{borderLeft:'1px solid #ddd',borderRight:'1px solid #ddd'}}>
                             you owe<br/>
-                            <span style={{color:'#ff652f'}}>$1496.74</span>
+                            <span style={{color:'#ff652f'}}>$0.00</span>
                         </Col>
                         <Col>
                             you are owed<br/>
                             $0.00
                         </Col>
                     </Row>
-                </Container>
+                {/* </Container> */}
             </div>
         );
     }

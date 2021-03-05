@@ -67,13 +67,13 @@ class SignUp extends Component {
                     <Row style={{color: 'indianred',marginLeft:'21rem',display:message?'inline-block':'none'}}><Alert variant='danger'>{message}</Alert></Row>
                     <Row>
                         <Col>
-                            <img src={logoSmall} alt="logo" style={{ height: '70%', width: '70%', margin: '6rem' }} />
+                            <img src={logoSmall} alt="logo" style={{ height: '65%', width: '50%', margin: '6rem',marginLeft:'16rem'  }} />
                         </Col>
                         <Col>
-                            <div style={{ margin: '6rem' }}>
+                            <div style={{ margin:'4rem', paddingRight:'8rem',marginLeft:'2rem' }}>
                                 <div class="panel">
                                     <h2 style={{ color: '#999', fontWeight: 'bold' }}>INTRODUCE YOURSELF</h2>
-                                </div><br />
+                                </div>
                                 <form onSubmit={this.onSubmit} method="post">
                                     <div class="form-group">
                                         <span style={{fontSize:'24px'}}>Hi there! My name is</span>
