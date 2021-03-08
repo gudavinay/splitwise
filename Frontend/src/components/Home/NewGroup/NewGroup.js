@@ -11,11 +11,10 @@ class NewGroup extends Component {
         super(props);
         this.state = {
             groupName: null,
-            groups: null,
             resp: [],
             open: false,
             defaultCount: 4,
-            selectedList: [],
+            selectedList: [(JSON.parse(localStorage.getItem("userProfile")).name + " / " +  JSON.parse(localStorage.getItem("userProfile")).email)],
             selected: null
         };
     }
@@ -41,6 +40,8 @@ class NewGroup extends Component {
         // var i=0;
         //   while(i++ != this.state.defaultCount)
         //     items.push(<li key={i}>hello world</li>)
+        const userProfile = localStorage.getItem("userProfile");
+        const userProfileJSON = JSON.parse(userProfile);
         console.log("state vars in newGROUP ---- ", this.state);
 
 
@@ -105,7 +106,7 @@ class NewGroup extends Component {
                                                     <option key={element.id} value={element.id}>{element.name} / {element.email}</option>
                                                 )}
                                             </datalist>
-                                            <Button onClick={(event) => {
+                                            <Button style={{ margin: '1rem' ,backgroundColor:'#5bc5a7' ,borderColor:'#5bc5a7'}} disabled={!this.state.selected} onClick={(event) => {
                                                 var tempList = this.state.selectedList;
                                                 tempList.push(this.state.selected);
                                                 var uniqueList = [... new Set(tempList)];
@@ -130,7 +131,7 @@ class NewGroup extends Component {
                                                         <li key={user}>{user}</li>
                                                     </Col>
                                                     <Col sm={2}>
-                                                        <a onClick={(e)=>{
+                                                        { !user.includes(userProfileJSON.email) && <a onClick={(e)=>{
                                                             console.log(e.target.id);
                                                             if(e.target.id){
                                                                 let tempList = this.state.selectedList;
@@ -142,7 +143,7 @@ class NewGroup extends Component {
                                                             }
                                                             }}><svg value={user} id={user} xmlns="http://www.w3.org/2000/svg" width="30" height="30" color='indianred' fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
                                                             <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
-                                                        </svg></a>
+                                                        </svg></a>}
                                                     </Col>
                                                 </Row>
                                             ))}
@@ -152,7 +153,28 @@ class NewGroup extends Component {
                                     <Row>
                                         <Col>
                                             <Button style={{ backgroundColor:'#FF6139' ,borderColor:'#FF6139'}} onClick={()=>{
-                                                console.log("save clicked");
+                                                let userIDArray = [];
+                                                this.state.selectedList.forEach(selection=>{
+                                                    this.state.resp.forEach(user =>{
+                                                        if(selection.includes(user.email)){
+                                                            userIDArray.push(user.rec_id);
+                                                        }
+                                                    });
+                                                });
+                                                console.log("userIDArray",userIDArray);
+                                                const data={
+                                                    groupName:this.state.groupName,
+                                                    email: userProfileJSON.email,
+                                                    user_rec_id: userProfileJSON.id,
+                                                    userIDArray:userIDArray
+                                                }
+                                                Axios.post(`${backendServer}/newGroup`, data)
+                                                .then(response => {
+                                                    console.log("response recieved from newgroup req", response);
+                                                })
+                                                .catch(error => {
+                                                    console.log("error recieved from newgroup req", error);
+                                                });
                                             }} >Save</Button>
                                         </Col>
                                     </Row>

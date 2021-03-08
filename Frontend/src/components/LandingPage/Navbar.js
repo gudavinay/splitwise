@@ -56,9 +56,9 @@ class Navbar extends Component {
                     <Col style={{ height: '48px', marginTop: '22px' }}>
                         <a href="/home/userProfile" style={{ margin: '1rem', color: 'whitesmoke', fontSize:'25px',fontWeight:'bold' }}>{userProfileJSON.name}</a>
                             <OverlayTrigger
-                                placement='right'
+                                placement='bottom'
                                 overlay={
-                                    <Tooltip id={`tooltip-right`}>
+                                    <Tooltip id={`tooltip-bottom`}>
                                         <strong>Logout</strong>
                                     </Tooltip>
                                 }>

@@ -10,8 +10,18 @@ import Sidebar from './Home/Sidebar/Sidebar';
 import RecentActivities from './Home/RecentActivities/RecentActivities';
 import UserProfile from './Home/UserProfile/UserProfile';
 import NewGroup from './Home/NewGroup/NewGroup';
+import GroupInfo from './Home/GroupInfo/GroupInfo';
 //Create a Main Component
 class Main extends Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            val: '',
+        }
+    }
+    // myFunc = (x) => {
+    //     console.log("inside myFunc",x);
+    // }
     render() {
         return (
             <div>
@@ -25,11 +35,13 @@ class Main extends Component {
                 {/* <Container> */}
                     <Row>
                         <Col sm={3} >
-                            <Route path="/home/s" component={Sidebar} />
+                            {/* <Route path="/home/s" component={Sidebar}><Sidebar myFunc = {this.myFunc}/></Route> */}
+                            <Route path="/home/s" component={Sidebar}></Route>
                         </Col>
                         <Col sm={9} >
                             <Route path="/home/s/dashboard" component={Dashboard} />
                             <Route path="/home/s/recentActivities" component={RecentActivities} />
+                            <Route path="/home/s/group/:id" component={GroupInfo} />
                         </Col>
                     </Row>
                 {/* </Container> */}
