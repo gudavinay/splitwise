@@ -50,11 +50,11 @@ class Login extends Component {
         }
 
         return (
-            <div>
+            <React.Fragment>
                 {redirectVar}
                 <Navbar />
                 <Container>
-                    <Row style={{color: 'indianred',marginLeft:'12rem',display:message?'inline-block':'none'}}><Alert variant='danger'>{message}</Alert></Row>
+                    <div style={{color: 'indianred',margin:'auto',display:message?'block':'none',width:'55%'}}><Alert variant='danger'>{message}</Alert></div>
                     <Row>
                         <Col>
                             <img src={logoSmall} alt="logo" style={{ height: '65%', width: '50%', margin: '6rem',marginLeft:'16rem' }} />
@@ -79,7 +79,7 @@ class Login extends Component {
                         </Col>
                     </Row>
                 </Container>
-            </div>
+            </React.Fragment>
         )
     }
 }

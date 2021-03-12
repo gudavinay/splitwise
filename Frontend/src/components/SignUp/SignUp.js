@@ -60,11 +60,11 @@ class SignUp extends Component {
             }
         }
         return (
-            <div>
+            <React.Fragment>
                 {redirectVar}
                 <Navbar />
                 <Container>
-                    <Row style={{color: 'indianred',marginLeft:'21rem',display:message?'inline-block':'none'}}><Alert variant='danger'>{message}</Alert></Row>
+                    <div style={{color: 'indianred',margin:'auto',display:message?'block':'none',width:'29%'}}><Alert variant='danger'>{message}</Alert></div>
                     <Row>
                         <Col>
                             <img src={logoSmall} alt="logo" style={{ height: '65%', width: '50%', margin: '6rem',marginLeft:'16rem'  }} />
@@ -101,7 +101,7 @@ class SignUp extends Component {
                         </Col>
                     </Row>
                 </Container>
-            </div>
+            </React.Fragment>
         )
     }
 }

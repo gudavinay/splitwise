@@ -2,6 +2,7 @@ import { Button, Modal } from 'react-bootstrap';
 import React, { Component } from 'react';
 import { Col, Container, Row} from 'react-bootstrap';
 import '../../splitwise.css'
+import { Link } from 'react-router-dom';
 
 class Dashboard extends Component {
     constructor(props) {
@@ -11,7 +12,7 @@ class Dashboard extends Component {
 
     render() {
         return (
-            <div>
+            <React.Fragment>
                 {/* {localStorage.getItem("userProfile")} */}
                 {/* I am in dashboard */}
                 {/* <Container> */}
@@ -20,10 +21,12 @@ class Dashboard extends Component {
                            <h2><strong>Dashboard</strong></h2> 
                         </Col>
                         <Col>
-                            <Button href="/home/newGroup" style={{ backgroundColor:'#FF6139' ,borderColor:'#FF6139'}}>Create a Group</Button>
+                            <Link className="btn btn-success" to="/home/newGroup" style={{ backgroundColor:'#FF6139' ,borderColor:'#FF6139',textDecoration:'none'}}>Create a Group</Link>
+                            {/* <Button href="/home/newGroup" style={{ backgroundColor:'#FF6139' ,borderColor:'#FF6139'}}>Create a Group</Button> */}
                         </Col>
                         <Col>
-                            <Button variant="success" href="/home/settle" style={{ backgroundColor:'#5bc5a7' ,borderColor:'#5bc5a7'}}>Settle up</Button>
+                            <Link className="btn btn-success" to="/home/settle" style={{ backgroundColor:'#5bc5a7' ,borderColor:'#5bc5a7'}}>Settle up</Link>
+                            {/* <Button variant="success" href="/home/settle" style={{ backgroundColor:'#5bc5a7' ,borderColor:'#5bc5a7'}}>Settle Up</Button> */}
                         </Col>
                     </Row>
                     <hr/>
@@ -42,7 +45,7 @@ class Dashboard extends Component {
                         </Col>
                     </Row>
                 {/* </Container> */}
-            </div>
+            </React.Fragment>
         );
     }
 }

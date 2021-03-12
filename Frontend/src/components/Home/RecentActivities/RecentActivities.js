@@ -8,9 +8,9 @@ class RecentActivities extends Component {
 
     render() {
         return (
-            <div>
+            <React.Fragment>
                 I am in recent activities
-            </div>
+            </React.Fragment>
         );
     }
 }

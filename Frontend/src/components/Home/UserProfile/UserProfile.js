@@ -16,7 +16,7 @@ class UserProfile extends Component {
         let userProfileJSON = JSON.parse(userProfile);
 
         return (
-            <div>
+            <React.Fragment>
                 <Container>
                     <Row>
                         <Col >
@@ -25,7 +25,7 @@ class UserProfile extends Component {
                                 <img src="https://png.pngtree.com/png-vector/20191023/ourlarge/pngtree-user-vector-icon-with-white-background-png-image_1849343.jpg" style={{ height: '100%', width: '100%' }} alt="profilephoto"/>
                             </center>
                         </Col>
-                        <Col style={{ marginTop: '5rem' }}>
+                        <Col style={{ margin: '5rem' }}>
                             <Row>
                                 Your name
                             </Row>
@@ -234,7 +234,7 @@ class UserProfile extends Component {
                         </Col>
                     </Row>
                 </Container>
-            </div>
+            </React.Fragment>
         );
     };
 }

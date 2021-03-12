@@ -17,7 +17,7 @@ class LandingPage extends Component {
             redirectVar = <Redirect to="/home/s/dashboard" />
         }
         return (
-            <div>
+            <React.Fragment>
                 {redirectVar}
                 <Navbar />
                 <Carousel interval={1500}>
@@ -34,7 +34,7 @@ class LandingPage extends Component {
                         <img src={homeBanner4} alt="Banner 4" style={{ height: '100%', width: '100%' }}></img>
                     </Carousel.Item>
                 </Carousel>
-            </div>
+            </React.Fragment>
         )
     }
 }

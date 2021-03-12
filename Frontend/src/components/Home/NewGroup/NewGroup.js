@@ -46,7 +46,7 @@ class NewGroup extends Component {
 
 
         return (
-            <div>
+            <React.Fragment>
                 {/* {localStorage.getItem("userProfile")}
                 I am in NewGroup */}
                 {/* {JSON.stringify(this.state.resp)} */}
@@ -190,7 +190,7 @@ class NewGroup extends Component {
                         </Col>
                     </Row>
                 </Container>
-            </div>
+            </React.Fragment>
         );
     }
 }

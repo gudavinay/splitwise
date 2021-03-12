@@ -3,6 +3,7 @@ import { Button, Col, Container, Row, Spinner, Toast } from 'react-bootstrap';
 import '../../splitwise.css';
 import backendServer from '../../../webConfig'
 import Axios from 'axios';
+import { Link } from 'react-router-dom';
 class Sidebar extends Component {
     constructor(props) {
         super(props);
@@ -38,16 +39,19 @@ class Sidebar extends Component {
     render() {
         console.log("props in sidebar", this.props);
         return (
-            <div>
+            <React.Fragment>
                 <div style={{ paddingLeft: '45%' }}>
                     <div className="sidebarItem">
-                        <a href="/home/s/dashboard" style={{ borderLeft: '6px solid #5bc5a7', color: '#5bc5a7', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none' }}>Dashboard</a><br />
+                        <Link style={{ borderLeft: '6px solid #5bc5a7', color: '#5bc5a7', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none' }} to="/home/s/dashboard">Dashboard</Link>
+                        {/* <a href="/home/s/dashboard" style={{ borderLeft: '6px solid #5bc5a7', color: '#5bc5a7', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none' }}>Dashboard</a><br /> */}
                     </div>
                     <div className="sidebarItem">
-                        <a href="/home/s/recentActivities" style={{ borderLeft: '6px solid #5bc5a7', color: '#ff652f', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none' }}>Recent&nbsp;Activities</a>
+                        <Link style={{ borderLeft: '6px solid #5bc5a7', color: '#ff652f', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none' }} to="/home/s/recentActivities">Recent&nbsp;Activities</Link>
+                        {/* <a href="/home/s/recentActivities" style={{ borderLeft: '6px solid #5bc5a7', color: '#ff652f', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none' }}>RecentActivities</a> */}
                     </div>
                     <div className="sidebarItem">
-                        <a href="/home/s/allGroups" style={{ borderLeft: '6px solid #5bc5a7', color: '#999', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none' }}>See all&nbsp;Groups{this.state.pendingGroupsToAcceptFlag && <Spinner animation="grow" size="sm" variant="danger" />}</a>
+                        <Link style={{ borderLeft: '6px solid #5bc5a7', color: '#999', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none' }} to="/home/s/allGroups" onClick={()=>this.setState({pendingGroupsToAcceptFlag:false})}>All&nbsp;Groups{this.state.pendingGroupsToAcceptFlag && <Spinner animation="grow" size="sm" variant="danger" />}</Link>
+                        {/* <a href="/home/s/allGroups" style={{ borderLeft: '6px solid #5bc5a7', color: '#999', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none' }}>See allGroups</a> */}
                     </div>
                     <br />
                     <hr />
@@ -57,18 +61,21 @@ class Sidebar extends Component {
                         GROUPS
                     </div>
                     {this.state.groups.map(function (group, index) {
-                        let refUrl = `/home/s/group/${group.group_id}`;
+                        // let refUrl = `/home/s/group/${group.group_id}`;
                         if (group.isAccepted == 1) {
-                            return <div className="sidebarItem" ><a key={index} href={refUrl} style={{ color: '#999', fontWeight: 'bold', textDecoration: 'none' }}>{group.name}</a></div>
+                            return <div className="sidebarItem" >
+                                <Link style={{ color: '#999', fontWeight: 'bold', textDecoration: 'none' }} to={"/home/s/group/"+group.group_id}>{group.name}</Link>
+                                {/* <a key={index} href={refUrl} style={{ color: '#999', fontWeight: 'bold', textDecoration: 'none' }}>{group.name}</a> */}
+                                </div>
                         } else {
-                            return <div></div>
+                            return <React.Fragment></React.Fragment>
                         }
                     })}
                 </div>
                 {/* {this.state.groups && this.state.groups[0] && <GroupsLoader state={this.state}/>} */}
 
 
-            </div>
+            </React.Fragment>
         );
     }
 }
