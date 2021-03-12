@@ -22,3 +22,12 @@
     text-transform: uppercase;
     padding: 0 5px;
 }
+
+.groupName{
+    color:#999;
+    text-decoration:'none';
+}
+.groupName:hover{
+    color:#5bc5a7;
+    text-decoration: none;
+}

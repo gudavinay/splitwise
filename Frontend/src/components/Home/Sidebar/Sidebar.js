@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Row, Spinner, Toast } from 'react-bootstrap';
 import '../../splitwise.css';
 import backendServer from '../../../webConfig'
 import Axios from 'axios';
@@ -7,7 +7,8 @@ class Sidebar extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            groups: []
+            groups: [],
+            pendingGroupsToAcceptFlag: false
         };
     }
 
@@ -21,7 +22,12 @@ class Sidebar extends Component {
             .then(response => {
                 console.log("response recieved from sidebar - fetch groups req", response);
                 this.setState({ groups: response.data });
-                localStorage.setItem("groupsInfo",JSON.stringify(response.data))
+                localStorage.setItem("groupsInfo", JSON.stringify(response.data))
+                response.data.forEach(group => {
+                    if (!this.state.pendingGroupsToAcceptFlag && group.isAccepted == 0) {
+                        this.setState({ pendingGroupsToAcceptFlag: true })
+                    }
+                });
             })
             .catch(error => {
                 console.log("error recieved from sidebar - fetch groups req", error);
@@ -40,28 +46,23 @@ class Sidebar extends Component {
                     <div className="sidebarItem">
                         <a href="/home/s/recentActivities" style={{ borderLeft: '6px solid #5bc5a7', color: '#ff652f', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none' }}>Recent&nbsp;Activities</a>
                     </div>
-                    <br/>
+                    <div className="sidebarItem">
+                        <a href="/home/s/allGroups" style={{ borderLeft: '6px solid #5bc5a7', color: '#999', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none' }}>See all&nbsp;Groups{this.state.pendingGroupsToAcceptFlag && <Spinner animation="grow" size="sm" variant="danger" />}</a>
+                    </div>
+                    <br />
                     <hr />
                 </div>
                 <div style={{ paddingLeft: '45%' }}>
                     <div className="sidebarHeading">
                         GROUPS
                     </div>
-                    {/* <div className="sidebarItem">
-                        <a onClick={() => this.props.history.push("/home/s/group/group1")} style={{ color: '#999', fontWeight: 'bold', textDecoration: 'none' }}>hello 1</a>
-                    </div>
-                    <div className="sidebarItem">
-                        <a href="/home/s/group/group1" style={{ color: '#999', fontWeight: 'bold', textDecoration: 'none' }}>hello 2</a>
-                    </div>
-                    <div className="sidebarItem">
-                        <a href="/home/s/group/group2" style={{ color: '#999', fontWeight: 'bold', textDecoration: 'none' }}>hello 3</a>
-                    </div>
-                    <div className="sidebarItem">
-                        <a href="/home/s/group/group3" style={{ color: '#999', fontWeight: 'bold', textDecoration: 'none' }}>hello 4</a>
-                    </div> */}
                     {this.state.groups.map(function (group, index) {
-                        let refUrl = `/home/s/group/${group.group_id}`
-                        return <div className="sidebarItem" ><a key={index} href={refUrl} style={{ color: '#999', fontWeight: 'bold', textDecoration: 'none' }}>{group.name}</a></div>
+                        let refUrl = `/home/s/group/${group.group_id}`;
+                        if (group.isAccepted == 1) {
+                            return <div className="sidebarItem" ><a key={index} href={refUrl} style={{ color: '#999', fontWeight: 'bold', textDecoration: 'none' }}>{group.name}</a></div>
+                        } else {
+                            return <div></div>
+                        }
                     })}
                 </div>
                 {/* {this.state.groups && this.state.groups[0] && <GroupsLoader state={this.state}/>} */}

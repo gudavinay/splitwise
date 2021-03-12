@@ -19,11 +19,11 @@ class Home extends Component {
         }
   
         return (
-            <div>
+            <React.Fragment>
                 {redirectVar}
                 <Navbar />
                 <br/>
-            </div>
+            </React.Fragment>
         )
     }
 }

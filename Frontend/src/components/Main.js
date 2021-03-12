@@ -11,6 +11,7 @@ import RecentActivities from './Home/RecentActivities/RecentActivities';
 import UserProfile from './Home/UserProfile/UserProfile';
 import NewGroup from './Home/NewGroup/NewGroup';
 import GroupInfo from './Home/GroupInfo/GroupInfo';
+import AllGroups from './Home/AllGroups/AllGroups';
 //Create a Main Component
 class Main extends Component {
     constructor(props){
@@ -42,6 +43,7 @@ class Main extends Component {
                             <Route path="/home/s/dashboard" component={Dashboard} />
                             <Route path="/home/s/recentActivities" component={RecentActivities} />
                             <Route path="/home/s/group/:id" component={GroupInfo} />
+                            <Route path="/home/s/allGroups" component={AllGroups} />
                         </Col>
                     </Row>
                 {/* </Container> */}
