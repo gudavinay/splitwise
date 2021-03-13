@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Button, Col, Container, Row, Spinner, Toast } from 'react-bootstrap';
 import '../../splitwise.css';
 import backendServer from '../../../webConfig'
 import Axios from 'axios';
@@ -37,7 +36,7 @@ class Sidebar extends Component {
     }
 
     render() {
-        console.log("props in sidebar", this.props);
+        // console.log("props in sidebar", this.props);
         return (
             <React.Fragment>
                 <div style={{ paddingLeft: '45%' }}>
@@ -50,7 +49,7 @@ class Sidebar extends Component {
                         {/* <a href="/home/s/recentActivities" style={{ borderLeft: '6px solid #5bc5a7', color: '#ff652f', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none' }}>RecentActivities</a> */}
                     </div>
                     <div className="sidebarItem">
-                        <Link style={{ borderLeft: '6px solid #5bc5a7', color: '#999', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none' }} to="/home/s/allGroups" onClick={()=>this.setState({pendingGroupsToAcceptFlag:false})}>All&nbsp;Groups{this.state.pendingGroupsToAcceptFlag && <Spinner animation="grow" size="sm" variant="danger" />}</Link>
+                        <Link style={{ borderLeft: '6px solid #5bc5a7', color: '#999', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none' }} to="/home/s/allGroups" onClick={()=>this.setState({pendingGroupsToAcceptFlag:false})}>All&nbsp;Groups{this.state.pendingGroupsToAcceptFlag && <span style={{color:'indianred'}}>*</span>}</Link>
                         {/* <a href="/home/s/allGroups" style={{ borderLeft: '6px solid #5bc5a7', color: '#999', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none' }}>See allGroups</a> */}
                     </div>
                     <br />
@@ -61,11 +60,10 @@ class Sidebar extends Component {
                         GROUPS
                     </div>
                     {this.state.groups.map(function (group, index) {
-                        // let refUrl = `/home/s/group/${group.group_id}`;
                         if (group.isAccepted == 1) {
                             return <div className="sidebarItem" >
-                                <Link style={{ color: '#999', fontWeight: 'bold', textDecoration: 'none' }} to={"/home/s/group/"+group.group_id}>{group.name}</Link>
-                                {/* <a key={index} href={refUrl} style={{ color: '#999', fontWeight: 'bold', textDecoration: 'none' }}>{group.name}</a> */}
+                                {/* <Link style={{ color: '#999', fontWeight: 'bold', textDecoration: 'none' }} to={"/home/s/group/"+group.group_id}>{group.name}</Link><br/> */}
+                                <a key={index} href={"/home/s/group/"+group.group_id} style={{ color: '#999', fontWeight: 'bold', textDecoration: 'none' }}>{group.name}</a>
                                 </div>
                         } else {
                             return <React.Fragment></React.Fragment>

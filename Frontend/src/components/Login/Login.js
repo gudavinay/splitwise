@@ -36,10 +36,6 @@ class Login extends Component {
         if (localStorage.getItem("userProfile")) {
             redirectVar = <Redirect to="/home/s/dashboard" />
         }
-        // console.log("******************************");
-        // console.log(this.props);
-        // console.log("******************************");
-
         if (this.state.loginClicked) {
             if (this.props.user && this.props.user.id) {
                 localStorage.setItem("userProfile", JSON.stringify(this.props.user));

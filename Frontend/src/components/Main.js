@@ -40,11 +40,8 @@ class Main extends Component {
             </Col>
             <Col sm={9}>
               <Route path="/home/s/dashboard" component={Dashboard} />
-              <Route
-                path="/home/s/recentActivities"
-                component={RecentActivities}
-              />
-              <Route path="/home/s/group/:id" component={GroupInfo} />
+              <Route path="/home/s/recentActivities" component={RecentActivities} />
+              <Route exact path="/home/s/group/:id" component={GroupInfo} />
               <Route path="/home/s/allGroups" component={AllGroups} />
             </Col>
           </Row>
