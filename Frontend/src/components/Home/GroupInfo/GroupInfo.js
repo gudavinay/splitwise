@@ -53,6 +53,15 @@ class GroupInfo extends Component {
       .catch(error => {
         console.log("error recieved from getAllExpenses req", error);
       });
+
+    Axios.post(`${backendServer}/getAllIndividualExpenses`, data)
+    .then(response => {
+      console.log("response recieved from getAllIndividualExpenses req", response);
+      this.setState({ allIndividualExpenses: response.data })
+    })
+    .catch(error => {
+      console.log("error recieved from getAllIndividualExpenses req", error);
+    });
   }
 
   
@@ -81,8 +90,8 @@ class GroupInfo extends Component {
     var userProfileJSON = JSON.parse(localStorage.getItem("userProfile"));
 
     console.log("props in groupinfo", this.props, this.state);
-    let tableData = "No data to display";
-    if (this.state.allExpenses && this.state.allExpenses.length > 0) {
+    let tableData = "No data found. Please try adding an expense.";
+    if (this.state.allExpenses && this.state.allExpenses.length > 0 && this.state.allExpenses[0] && this.state.allExpenses[0].group_id) {
       tableData=[];
       this.state.allExpenses.forEach(expense => {
         let tableRow = (
@@ -100,11 +109,45 @@ class GroupInfo extends Component {
       });
     }
 
+
+    let userExpense = {};
+    let groupBalances = "Calculating group balances...";
+    if(this.state.allIndividualExpenses && this.state.allIndividualExpenses.length > 0&& this.state.allIndividualExpenses[0] && this.state.allIndividualExpenses[0].group_id && this.state.allExpenses && this.state.allExpenses.length > 0 && this.state.allExpenses[0] && this.state.allExpenses[0].group_id){
+      // this.state.allIndividualExpenses.forEach((expense,index)=>{
+      //   userExpense[expense.paid_by] = 
+      // });
+      this.state.allExpenses.forEach(expense =>{
+        userExpense[expense.paid_by] = 0;
+      });
+      this.state.allIndividualExpenses.forEach(expense =>{
+        userExpense[expense.paid_to] = 0;
+      });
+      this.state.allExpenses.forEach(expense =>{
+        // console.log(userExpense,userExpense[expense.paid_by],(expense.amount),userExpense[expense.paid_by]-(expense.amount));
+        userExpense[expense.paid_by] = Number(userExpense[expense.paid_by])-Number(expense.amount);
+      });
+      this.state.allIndividualExpenses.forEach(expense =>{
+        userExpense[expense.paid_to] = Number(userExpense[expense.paid_to])+Number(expense.amount);
+      });
+
+      console.log(JSON.stringify(userExpense));
+      
+      groupBalances = [];
+        Object.keys(userExpense).forEach(index => {
+          groupBalances.push(<Row>
+              {index} {userExpense[index]}
+            </Row>)
+        })
+    }
+
+
     // console.log("url params in groupinfo - ", id);
     return (
       <React.Fragment>
         {/* you're in group {id} */}
-        <Table bordered hover style={{ width: '80%', margin: 'auto' }}>
+        <Row>
+          <Col sm={8}>
+          <Table bordered hover style={{ width: '100%', margin: 'auto' }}>
           <tbody>
             <tr style={{ background: '#eee',fontSize:'25px',fontWeight:'bold' }}>
               <td>
@@ -123,6 +166,16 @@ class GroupInfo extends Component {
             {tableData}
           </tbody>
         </Table>
+          </Col>
+          <Col>
+            <span style={{color:'#999', fontWeight:'bold'}}>GROUP BALANCES</span>
+            {groupBalances}
+          </Col>
+        </Row>
+        {JSON.stringify(this.state.allExpenses)}<br/><br/>
+        {JSON.stringify(this.state.allIndividualExpenses)}
+
+
         {/* {JSON.stringify(this.state.allExpenses)} */}
         <div>
           <Modal show={this.state.show} onHide={() => this.setState({ show: false })}>

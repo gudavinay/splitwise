@@ -78,7 +78,7 @@ class AllGroups extends Component {
                     this.props.history.push('/home/s/group/'+this.state.groupsInfo.find(group=> group.name == this.state.selected).group_id);
                 }}>Add</Button>
                 <hr />
-
+                {groupsInfoJSON && groupsInfoJSON.length==0 && <span style={{fontWeight:'bold', color:'#999'}}>No groups found. Please try creating a group in dashboard.</span>}
                 <Table striped borderless >
                     <tbody>
                         {groupsInfoJSON.map(group => {
