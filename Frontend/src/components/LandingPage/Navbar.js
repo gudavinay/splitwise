@@ -1,13 +1,11 @@
 import React, { Component } from "react";
 import {
-  Button,
   Col,
   Container,
   OverlayTrigger,
   Row,
   Tooltip,
 } from "react-bootstrap";
-import logoSplitwise from "../../images/logo.png";
 import { logoutRedux } from "../../reduxOps/reduxActions/loginRedux";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
@@ -16,9 +14,6 @@ import { getUserID, getUserName, getUserProfile } from "../Services/ControllerUt
 // import store from './../../store';
 
 class Navbar extends Component {
-  constructor(props) {
-    super(props);
-  }
   render() {
     var loggedIn = getUserProfile() && getUserID()? true : false;
     console.log(

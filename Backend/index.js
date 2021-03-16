@@ -342,6 +342,27 @@ app.post('/getAllIndividualExpenses', async function (req, res) {
     });
 });
 
+app.post('/getAllUserExpenses', async function (req, res) {
+    console.log(req.body);
+    var sql = `SELECT e.group_id,e.description,e.paid_by,e.paid_to,u.name,e.settled,e.amount,e.created_date FROM expenses_table AS e INNER JOIN user_profile_table AS u ON e.paid_to=u.rec_id WHERE group_id in (SELECT group_id from user_group_table where user_id = '${req.body.user_id}') order by e.created_date desc`;
+    // var sql = `SELECT * FROM expenses_table where group_id='${req.body.group_id}'`;
+    await connection.query(sql, function (error, result) {
+        console.log("query executed successfully", sql, result, error);
+        // console.log("test res",result[0]);
+        if (error) {
+            res.writeHead(200, {
+                'Content-Type': 'text/plain'
+            });
+            res.end(error.code);
+        } else {
+            res.writeHead(200, {
+                'Content-Type': 'text/plain'
+            });
+            res.end(JSON.stringify(result));
+        }
+    });
+});
+
 
 //start your server on port 3001
 app.listen(3001);

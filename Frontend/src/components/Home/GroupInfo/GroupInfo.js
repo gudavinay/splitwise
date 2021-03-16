@@ -1,9 +1,8 @@
-import React, { Component, useEffect, useState } from "react";
-import { Button, Col, Form, Modal, Row, Table } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import React, { Component } from "react";
+import { Button, Col, Modal, Row, Table } from "react-bootstrap";
 import Axios from 'axios';
 import backendServer from '../../../webConfig'
-import {currencyConverter, getUserID, getUserProfile, getUserCurrency, getGroupsInfo} from '../../Services/ControllerUtils'
+import {currencyConverter, getUserID, getUserProfile, getUserCurrency, getGroupsInfo, getMonthFromUtils, getDateFromUtils} from '../../Services/ControllerUtils'
 // import { useParams } from 'react-router-dom';
 import "../../splitwise.css";
 class GroupInfo extends Component {
@@ -83,9 +82,8 @@ class GroupInfo extends Component {
   // }
   render() {
     // let {id} = useParams();
-    const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
     const { id } = this.props.match.params;
-    const currentGroupInfo = getGroupsInfo().find(group => group.group_id == id);
+    const currentGroupInfo = getGroupsInfo().find(group => group.group_id === Number(id));
     var userProfileJSON = getUserProfile();
 
     console.log("props in groupinfo", this.props, this.state);
@@ -98,11 +96,11 @@ class GroupInfo extends Component {
             <td>
               <Row>
                 <Col sm={1} style={{paddingLeft:'2rem',color:'#999'}}>
-                  <Row style={{fontSize:'12px'}}>{months[new Date(expense.created_date).getMonth()]}</Row>
-                  <Row style={{fontSize:'20px'}}>{new Date(expense.created_date).getDate()}</Row>
+                  <Row style={{fontSize:'12px'}}>{getMonthFromUtils(expense.created_date)}</Row>
+                  <Row style={{fontSize:'20px'}}>{getDateFromUtils(expense.created_date)}</Row>
                   </Col>
                 <Col sm={7} style={{margin:'auto'}}>{expense.description}</Col>
-                <Col sm={4} style={{color:'#999'}}><strong>{expense.paid_by==userProfileJSON.id?`You `:expense.paid_by_name}</strong> paid<br /><span style={{color:'black'}}><strong>{currencyConverter(userProfileJSON.currency)} {expense.amount}</strong></span></Col>
+                <Col sm={4} style={{color:'#999'}}><strong>{expense.paid_by===userProfileJSON.id?`You `:expense.paid_by_name}</strong> paid<br /><span style={{color:'black'}}><strong>{currencyConverter(userProfileJSON.currency)} {expense.amount}</strong></span></Col>
                 {/* <Col sm={2}>Paid By<br />{expense.paid_to_name}</Col> */}
               </Row>
             </td>
@@ -115,7 +113,7 @@ class GroupInfo extends Component {
 
     let userExpense = {};
     let userExpenseNames = {};
-    let groupBalances = "Calculating group balances...";
+    let groupBalances = "No data found.";
     if(this.state.allIndividualExpenses && this.state.allIndividualExpenses.length > 0&& this.state.allIndividualExpenses[0] && this.state.allIndividualExpenses[0].group_id && this.state.allExpenses && this.state.allExpenses.length > 0 && this.state.allExpenses[0] && this.state.allExpenses[0].group_id){
       // this.state.allIndividualExpenses.forEach((expense,index)=>{
       //   userExpense[expense.paid_by] = 
@@ -129,7 +127,6 @@ class GroupInfo extends Component {
         userExpenseNames[expense.paid_to] = expense.name;
       });
       this.state.allExpenses.forEach(expense =>{
-        // console.log(userExpense,userExpense[expense.paid_by],(expense.amount),userExpense[expense.paid_by]-(expense.amount));
         userExpense[expense.paid_by] = (Number(userExpense[expense.paid_by])-Number(expense.amount)).toFixed(2);
       });
       this.state.allIndividualExpenses.forEach(expense =>{
@@ -142,9 +139,9 @@ class GroupInfo extends Component {
         Object.keys(userExpense).forEach(index => {
           let rowData = null;
           if(userExpense[index]<0){
-            rowData = (<Col><Row>{userExpenseNames[index]}</Row><Row><span style={{fontSize:'12px',padding:'0', color:'#5bc5a7'}}> gets back <span style={{fontSize:'14px',fontWeight:'bold'}}>{currencyConverter(userProfileJSON.currency)} {userExpense[index]*-1}</span></span></Row></Col>);
+            rowData = (<Col><Row>{userExpenseNames[index]}</Row><Row><span style={{fontSize:'12px',padding:'0', color:'#5bc5a7'}}> gets back <span style={{fontSize:'14px',fontWeight:'bold'}}>{getUserCurrency()} {userExpense[index]*-1}</span></span></Row></Col>);
           }else if (userExpense[index] > 0){
-            rowData = (<Col><Row>{userExpenseNames[index]}</Row><Row><span style={{fontSize:'12px',padding:'0', color:'#ff652f'}}> owes <span style={{fontSize:'14px',fontWeight:'bold'}}>{currencyConverter(userProfileJSON.currency)} {userExpense[index]}</span></span></Row></Col>);
+            rowData = (<Col><Row>{userExpenseNames[index]}</Row><Row><span style={{fontSize:'12px',padding:'0', color:'#ff652f'}}> owes <span style={{fontSize:'14px',fontWeight:'bold'}}>{getUserCurrency()} {userExpense[index]}</span></span></Row></Col>);
           }else{
             rowData = (<Col><Row>{userExpenseNames[index]}</Row><Row><span style={{fontSize:'12px',padding:'0', color:'#999'}}>settled up</span></Row></Col>);
           }
@@ -171,8 +168,7 @@ class GroupInfo extends Component {
                     {currentGroupInfo.name}
                   </Col>
                   <Col style={{textAlign:'right'}}>
-                    <Button onClick={() => this.setState({ show: true })} className="btn btn-success" style={{ backgroundColor: '#FF6139', borderColor: '#FF6139', textDecoration: 'none' ,margin:'0px 10px'}}>Add an expense</Button> 
-                  <Button onClick={() => this.setState({ show: true })} className="btn btn-success" style={{ backgroundColor:'#5bc5a7' ,borderColor:'#5bc5a7'}}>Settle up</Button>
+                    <Button onClick={() => this.setState({ show: true })} className="btn btn-success" style={{ backgroundColor: '#FF6139', borderColor: '#FF6139', textDecoration: 'none' ,margin:'0px 10px'}}>Add an expense</Button>
                   </Col>
                 </Row>
                  
@@ -187,8 +183,8 @@ class GroupInfo extends Component {
             {groupBalances}
           </Col>
         </Row>
-        {JSON.stringify(this.state.allExpenses)}<br/><br/>
-        {JSON.stringify(this.state.allIndividualExpenses)}
+        {/* {JSON.stringify(this.state.allExpenses)}<br/><br/>
+        {JSON.stringify(this.state.allIndividualExpenses)} */}
 
 
         {/* {JSON.stringify(this.state.allExpenses)} */}
@@ -211,7 +207,7 @@ class GroupInfo extends Component {
                       </Col>
                       <Col>
                         <Row style={{ width: '100%' }}>
-                          <input type="text" className="form-control" name="description" onChange={(e) => this.setState({ description: e.target.value })} placeholder="Enter a description" title="Please enter a description" title="Enter a valid number" required />
+                          <input type="text" className="form-control" name="description" onChange={(e) => this.setState({ description: e.target.value })} placeholder="Enter a description" title="Please enter a description" required />
                         </Row>
                         <Row style={{ marginTop: '1rem' }}>
                           <Col sm={2} style={{margin:'auto'}}>{getUserCurrency()}</Col>

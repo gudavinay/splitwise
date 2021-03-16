@@ -1,3 +1,4 @@
+import { Button } from 'react-bootstrap';
 import React, { Component } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { getUserEmail, getUserName ,getUserPhone, getUserCurrencyDesc,getUserTimezone,getUserLanguage} from '../../Services/ControllerUtils';
@@ -10,6 +11,15 @@ class UserProfile extends Component {
 
         }
     }
+
+    uploadImage = (e)=>{
+        if(e.target.files)
+        this.setState({
+            file:e.target.files[0],
+            fileText: e.target.files[0].name
+        })
+    }
+
     render() {
         return (
             <React.Fragment>
@@ -19,6 +29,7 @@ class UserProfile extends Component {
                             <center>
                                 <h2>Your account</h2>
                                 <img src="https://png.pngtree.com/png-vector/20191023/ourlarge/pngtree-user-vector-icon-with-white-background-png-image_1849343.jpg" style={{ height: '100%', width: '100%' }} alt="profilephoto"/>
+                                <input type="file" name="profilepicture" accept="image/*" onChange={this.uploadImage}/>
                             </center>
                         </Col>
                         <Col style={{ margin: '5rem' }}>
@@ -228,6 +239,10 @@ class UserProfile extends Component {
                                 </select>
                             </Row>
                         </Col>
+
+                        <Row >
+                            <Button style={{ margin: '1rem' ,backgroundColor:'#5bc5a7' ,borderColor:'#5bc5a7'}} >Save</Button>
+                        </Row>
                     </Row>
                 </Container>
             </React.Fragment>

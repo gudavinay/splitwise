@@ -1,3 +1,6 @@
+
+const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+
 export function currencyConverter(currency){
     switch(currency.toUpperCase()){
         case 'USD':return '$';
@@ -53,6 +56,15 @@ export function getUserLanguage(){
 export function getUserCurrency(){
     return currencyConverter(getUserProfile().currency);
 }
+
+export function getMonthFromUtils(date){
+    return months[new Date(date).getMonth()];
+}
+
+export function getDateFromUtils(date){
+    return new Date(date).getDate();
+}
+
 
 // exports.findUserName = findUserName;
 // exports.currencyConverter = currencyConverter;

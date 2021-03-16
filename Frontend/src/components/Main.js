@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import { Route, Switch } from "react-router-dom";
+import { Route } from "react-router-dom";
 import Login from "./Login/Login";
 import Home from "./Home/Home";
 import LandingPage from "./LandingPage/LandingPage";
 import SignUp from "./SignUp/SignUp";
 import Dashboard from "./Home/Dashboard/Dashboard";
-import { Col, Container, Row } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 import Sidebar from "./Home/Sidebar/Sidebar";
 import RecentActivities from "./Home/RecentActivities/RecentActivities";
 import UserProfile from "./Home/UserProfile/UserProfile";

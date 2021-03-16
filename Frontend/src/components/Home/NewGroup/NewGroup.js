@@ -1,6 +1,6 @@
-import { Button, Collapse, Modal } from 'react-bootstrap';
+import { Button, Collapse } from 'react-bootstrap';
 import React, { Component } from 'react';
-import { Col, Container, Row, Glyphicon } from 'react-bootstrap';
+import { Col, Container, Row } from 'react-bootstrap';
 import Axios from 'axios';
 import backendServer from '../../../webConfig';
 import logoSmall from '../../../images/logoSmall.png';
@@ -21,9 +21,6 @@ class NewGroup extends Component {
     }
 
     componentDidMount() {
-        // alert("component mounted");
-        // if (!this.state.groups) {
-        // alert("loaded groups also");
         Axios.get(`${backendServer}/fetchUsers`)
             .then(response => {
                 console.log(response);
@@ -31,9 +28,7 @@ class NewGroup extends Component {
             })
             .catch(error => {
                 console.log(error);
-                // this.setState({ resp: error });
             });
-        // }
     }
 
     render() {
@@ -97,7 +92,7 @@ class NewGroup extends Component {
                                             <Button style={{ margin: '1rem' ,backgroundColor:'#5bc5a7' ,borderColor:'#5bc5a7'}} disabled={!this.state.selected} onClick={(event) => {
                                                 var tempList = this.state.selectedList;
                                                 tempList.push(this.state.selected);
-                                                var uniqueList = [... new Set(tempList)];
+                                                var uniqueList = [...new Set(tempList)];
                                                 this.setState({ selectedList: uniqueList });
                                                 document.getElementById("newGroupPersons").value = '';
                                             }}>Add</Button>
