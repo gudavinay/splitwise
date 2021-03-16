@@ -7,6 +7,7 @@ import logoSmall from '../../images/logoSmall.png';
 import { loginRedux } from '../../reduxOps/reduxActions/loginRedux';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { getUserProfile } from '../Services/ControllerUtils';
 
 //Define a Login Component
 class Login extends Component {
@@ -33,7 +34,7 @@ class Login extends Component {
 
     render() {
         let redirectVar,message = null;
-        if (localStorage.getItem("userProfile")) {
+        if (getUserProfile()) {
             redirectVar = <Redirect to="/home/s/dashboard" />
         }
         if (this.state.loginClicked) {

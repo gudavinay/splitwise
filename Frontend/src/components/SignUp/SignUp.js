@@ -8,6 +8,7 @@ import { signupRedux } from '../../reduxOps/reduxActions/signupRedux';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Alert } from 'react-bootstrap';
+import { getUserProfile } from '../Services/ControllerUtils';
 
 //Define a Login Component
 class SignUp extends Component {
@@ -45,7 +46,7 @@ class SignUp extends Component {
 
     render() {
         let redirectVar = null,message = null;
-        if (localStorage.getItem("userProfile")) {
+        if (getUserProfile()) {
             redirectVar = <Redirect to="/home/s/dashboard" />
         }
         if (this.state.signupClicked) {

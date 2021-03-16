@@ -5,6 +5,7 @@ import Axios from 'axios';
 import backendServer from '../../../webConfig';
 import logoSmall from '../../../images/logoSmall.png';
 import '../../splitwise.css'
+import { getUserEmail, getUserID, getUserName } from '../../Services/ControllerUtils';
 
 class NewGroup extends Component {
     constructor(props) {
@@ -14,7 +15,7 @@ class NewGroup extends Component {
             resp: [],
             open: false,
             defaultCount: 4,
-            selectedList: [(JSON.parse(localStorage.getItem("userProfile")).name + " / " +  JSON.parse(localStorage.getItem("userProfile")).email)],
+            selectedList: [(getUserName() + " / " +  getUserEmail())],
             selected: null
         };
     }
@@ -36,21 +37,8 @@ class NewGroup extends Component {
     }
 
     render() {
-        // const items = []
-        // var i=0;
-        //   while(i++ != this.state.defaultCount)
-        //     items.push(<li key={i}>hello world</li>)
-        const userProfile = localStorage.getItem("userProfile");
-        const userProfileJSON = JSON.parse(userProfile);
-        console.log("state vars in newGROUP ---- ", this.state);
-
-
         return (
             <React.Fragment>
-                {/* {localStorage.getItem("userProfile")}
-                I am in NewGroup */}
-                {/* {JSON.stringify(this.state.resp)} */}
-
                 <Container>
                     <Row>
                         <Col>
@@ -131,7 +119,7 @@ class NewGroup extends Component {
                                                         <li key={user}>{user}</li>
                                                     </Col>
                                                     <Col sm={2}>
-                                                        { !user.includes(userProfileJSON.email) && <a onClick={(e)=>{
+                                                        { !user.includes(getUserEmail()) && <a onClick={(e)=>{
                                                             console.log(e.target.id);
                                                             if(e.target.id){
                                                                 let tempList = this.state.selectedList;
@@ -164,8 +152,8 @@ class NewGroup extends Component {
                                                 console.log("userIDArray",userIDArray);
                                                 const data={
                                                     groupName:this.state.groupName,
-                                                    email: userProfileJSON.email,
-                                                    user_rec_id: userProfileJSON.id,
+                                                    email: getUserEmail(),
+                                                    user_rec_id: getUserID(),
                                                     userIDArray:userIDArray
                                                 }
                                                 Axios.post(`${backendServer}/newGroup`, data)

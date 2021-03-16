@@ -8,12 +8,13 @@ import homeBanner2 from '../../images/homeBanner2.png';
 import homeBanner3 from '../../images/homeBanner3.png';
 import homeBanner4 from '../../images/homeBanner4.png';
 import { Redirect } from 'react-router';
+import { getUserProfile } from '../Services/ControllerUtils';
 
 
 class LandingPage extends Component {
     render() {
         let redirectVar = null;
-        if (localStorage.getItem("userProfile")) {
+        if (getUserProfile()) {
             redirectVar = <Redirect to="/home/s/dashboard" />
         }
         return (

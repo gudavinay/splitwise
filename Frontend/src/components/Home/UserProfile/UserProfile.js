@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
+import { getUserEmail, getUserName ,getUserPhone, getUserCurrencyDesc,getUserTimezone,getUserLanguage} from '../../Services/ControllerUtils';
 // import store from '../../../store'
 
 class UserProfile extends Component {
@@ -10,11 +11,6 @@ class UserProfile extends Component {
         }
     }
     render() {
-        // const state = store.getState();
-        // console.log("in user profile - ", state);
-        const userProfile = localStorage.getItem("userProfile");
-        let userProfileJSON = JSON.parse(userProfile);
-
         return (
             <React.Fragment>
                 <Container>
@@ -30,21 +26,21 @@ class UserProfile extends Component {
                                 Your name
                             </Row>
                             <Row>
-                                <input value={userProfileJSON.name} />
+                                <input value={getUserName()} />
                             </Row>
                             <br />
                             <Row>
                                 Your email address
                             </Row>
                             <Row>
-                                <input value={userProfileJSON.email} />
+                                <input value={getUserEmail()} />
                             </Row>
                             <br />
                             <Row>
                                 Your phone number
                             </Row>
                             <Row>
-                                <input value={userProfileJSON.phone} />
+                                <input value={getUserPhone()} />
                             </Row>
                         </Col>
                         <Col style={{ marginTop: '5rem' }}>
@@ -52,7 +48,7 @@ class UserProfile extends Component {
                                 Your default currency
                             </Row>
                             <Row>
-                                <select name="currency" id="currency" value={userProfileJSON.currency}>
+                                <select name="currency" id="currency" value={getUserCurrencyDesc()}>
                                     <option value="USD">USD ($)</option>
                                     <option value="KWD">KWD (KWD)</option>
                                     <option value="BHD">BHD (BD)</option>
@@ -66,7 +62,7 @@ class UserProfile extends Component {
                                 Your time zone
                             </Row>
                             <Row>
-                                <select name="timezone" id="timezone" value={userProfileJSON.timezone}>
+                                <select name="timezone" id="timezone" value={getUserTimezone()}>
                                     <option timeZoneId="1" gmtAdjustment="GMT-12:00" useDaylightTime="0" value="-12">(GMT-12:00) International Date Line West</option>
                                     <option timeZoneId="2" gmtAdjustment="GMT-11:00" useDaylightTime="0" value="-11">(GMT-11:00) Midway Island, Samoa</option>
                                     <option timeZoneId="3" gmtAdjustment="GMT-10:00" useDaylightTime="0" value="-10">(GMT-10:00) Hawaii</option>
@@ -156,7 +152,7 @@ class UserProfile extends Component {
                                 Language
                             </Row>
                             <Row>
-                                <select name="language" id="language" value={userProfileJSON.language}>
+                                <select name="language" id="language" value={getUserLanguage()}>
                                     <option value="AF">Afrikaans</option>
                                     <option value="SQ">Albanian</option>
                                     <option value="AR">Arabic</option>

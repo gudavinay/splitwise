@@ -3,6 +3,7 @@ import { Button, Col, Form, Modal, Row, Table } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Axios from 'axios';
 import backendServer from '../../../webConfig'
+import {currencyConverter, getUserID, getUserProfile, getUserCurrency, getGroupsInfo} from '../../Services/ControllerUtils'
 // import { useParams } from 'react-router-dom';
 import "../../splitwise.css";
 class GroupInfo extends Component {
@@ -20,16 +21,14 @@ class GroupInfo extends Component {
     console.log("constructor in groups ****************");
   }
 
-
   onSubmit = async (event) => {
     event.preventDefault();
     const data = {
       description: this.state.description,
       amount: parseFloat(this.state.amount),
       group_id: this.props.match.params.id,
-      paid_by: "" + JSON.parse(localStorage.getItem("userProfile")).id
+      paid_by: "" + getUserID()
     };
-    console.log(data, JSON.parse(localStorage.getItem("userProfile")));
     await Axios.post(`${backendServer}/addExpense`, data)
       .then(response => {
         console.log("response recieved from addExpense req", response);
@@ -84,10 +83,10 @@ class GroupInfo extends Component {
   // }
   render() {
     // let {id} = useParams();
-
+    const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
     const { id } = this.props.match.params;
-    const currentGroupInfo = JSON.parse(localStorage.getItem("groupsInfo")).find(group => group.group_id == id);
-    var userProfileJSON = JSON.parse(localStorage.getItem("userProfile"));
+    const currentGroupInfo = getGroupsInfo().find(group => group.group_id == id);
+    var userProfileJSON = getUserProfile();
 
     console.log("props in groupinfo", this.props, this.state);
     let tableData = "No data found. Please try adding an expense.";
@@ -98,8 +97,12 @@ class GroupInfo extends Component {
           <tr>
             <td>
               <Row>
-                <Col sm={8}>{expense.description}</Col>
-                <Col sm={4}><strong>{expense.paid_by==userProfileJSON.id?`You `:expense.paid_by_name}</strong> paid<br /><strong>{userProfileJSON.currency} </strong>{expense.amount}</Col>
+                <Col sm={1} style={{paddingLeft:'2rem',color:'#999'}}>
+                  <Row style={{fontSize:'12px'}}>{months[new Date(expense.created_date).getMonth()]}</Row>
+                  <Row style={{fontSize:'20px'}}>{new Date(expense.created_date).getDate()}</Row>
+                  </Col>
+                <Col sm={7} style={{margin:'auto'}}>{expense.description}</Col>
+                <Col sm={4} style={{color:'#999'}}><strong>{expense.paid_by==userProfileJSON.id?`You `:expense.paid_by_name}</strong> paid<br /><span style={{color:'black'}}><strong>{currencyConverter(userProfileJSON.currency)} {expense.amount}</strong></span></Col>
                 {/* <Col sm={2}>Paid By<br />{expense.paid_to_name}</Col> */}
               </Row>
             </td>
@@ -111,6 +114,7 @@ class GroupInfo extends Component {
 
 
     let userExpense = {};
+    let userExpenseNames = {};
     let groupBalances = "Calculating group balances...";
     if(this.state.allIndividualExpenses && this.state.allIndividualExpenses.length > 0&& this.state.allIndividualExpenses[0] && this.state.allIndividualExpenses[0].group_id && this.state.allExpenses && this.state.allExpenses.length > 0 && this.state.allExpenses[0] && this.state.allExpenses[0].group_id){
       // this.state.allIndividualExpenses.forEach((expense,index)=>{
@@ -118,25 +122,36 @@ class GroupInfo extends Component {
       // });
       this.state.allExpenses.forEach(expense =>{
         userExpense[expense.paid_by] = 0;
+        userExpenseNames[expense.paid_by] = expense.name;
       });
       this.state.allIndividualExpenses.forEach(expense =>{
         userExpense[expense.paid_to] = 0;
+        userExpenseNames[expense.paid_to] = expense.name;
       });
       this.state.allExpenses.forEach(expense =>{
         // console.log(userExpense,userExpense[expense.paid_by],(expense.amount),userExpense[expense.paid_by]-(expense.amount));
-        userExpense[expense.paid_by] = Number(userExpense[expense.paid_by])-Number(expense.amount);
+        userExpense[expense.paid_by] = (Number(userExpense[expense.paid_by])-Number(expense.amount)).toFixed(2);
       });
       this.state.allIndividualExpenses.forEach(expense =>{
-        userExpense[expense.paid_to] = Number(userExpense[expense.paid_to])+Number(expense.amount);
+        userExpense[expense.paid_to] = (Number(userExpense[expense.paid_to])+Number(expense.amount)).toFixed(2);
       });
 
       console.log(JSON.stringify(userExpense));
       
       groupBalances = [];
         Object.keys(userExpense).forEach(index => {
-          groupBalances.push(<Row>
-              {index} {userExpense[index]}
-            </Row>)
+          let rowData = null;
+          if(userExpense[index]<0){
+            rowData = (<Col><Row>{userExpenseNames[index]}</Row><Row><span style={{fontSize:'12px',padding:'0', color:'#5bc5a7'}}> gets back <span style={{fontSize:'14px',fontWeight:'bold'}}>{currencyConverter(userProfileJSON.currency)} {userExpense[index]*-1}</span></span></Row></Col>);
+          }else if (userExpense[index] > 0){
+            rowData = (<Col><Row>{userExpenseNames[index]}</Row><Row><span style={{fontSize:'12px',padding:'0', color:'#ff652f'}}> owes <span style={{fontSize:'14px',fontWeight:'bold'}}>{currencyConverter(userProfileJSON.currency)} {userExpense[index]}</span></span></Row></Col>);
+          }else{
+            rowData = (<Col><Row>{userExpenseNames[index]}</Row><Row><span style={{fontSize:'12px',padding:'0', color:'#999'}}>settled up</span></Row></Col>);
+          }
+          groupBalances.push(rowData);
+          // groupBalances.push(<Row>
+          //     {userExpenseNames[index]} {userExpense[index]}
+          //   </Row>)
         })
     }
 
@@ -168,7 +183,7 @@ class GroupInfo extends Component {
         </Table>
           </Col>
           <Col>
-            <span style={{color:'#999', fontWeight:'bold'}}>GROUP BALANCES</span>
+            <span style={{color:'#999', fontWeight:'bold'}}>GROUP BALANCES</span><br/>
             {groupBalances}
           </Col>
         </Row>
@@ -199,7 +214,7 @@ class GroupInfo extends Component {
                           <input type="text" className="form-control" name="description" onChange={(e) => this.setState({ description: e.target.value })} placeholder="Enter a description" title="Please enter a description" title="Enter a valid number" required />
                         </Row>
                         <Row style={{ marginTop: '1rem' }}>
-                          <Col sm={2}>{JSON.parse(localStorage.getItem("userProfile")).currency}</Col>
+                          <Col sm={2} style={{margin:'auto'}}>{getUserCurrency()}</Col>
                           <Col><input type="number" className="form-control" min="0" name="amount" onChange={(e) => this.setState({ amount: e.target.value })} placeholder="0.00" title="Please enter valid Full Name" pattern='(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$' required />
                           </Col>
                         </Row>

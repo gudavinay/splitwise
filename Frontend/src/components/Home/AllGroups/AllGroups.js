@@ -1,11 +1,10 @@
-import { Button, Collapse, Modal, Table } from 'react-bootstrap';
+import { Button, Table } from 'react-bootstrap';
 import React, { Component } from 'react';
-import { Col, Container, Row, Glyphicon } from 'react-bootstrap';
 import Axios from 'axios';
 import backendServer from '../../../webConfig';
-import logoSmall from '../../../images/logoSmall.png';
 import '../../splitwise.css'
 import { Link } from 'react-router-dom';
+import { getUserProfile, getUserID, getUserEmail, getUserName, getGroupsInfo } from '../../Services/ControllerUtils'
 
 class AllGroups extends Component {
     constructor(props) {
@@ -15,7 +14,7 @@ class AllGroups extends Component {
             resp: [],
             open: false,
             defaultCount: 4,
-            selectedList: [(JSON.parse(localStorage.getItem("userProfile")).name + " / " + JSON.parse(localStorage.getItem("userProfile")).email)],
+            selectedList: [(getUserName() + " / " + getUserEmail())],
             selected: null
         };
     }
@@ -24,7 +23,7 @@ class AllGroups extends Component {
         console.log(e.target.id);
         const data = {
             group_id: e.target.id,
-            user_id: JSON.parse(localStorage.getItem("userProfile")).id,
+            user_id: getUserID(),
             isAccepted: e.target.name == 'A' ? 1 : -1
         }
         console.log("passing in acceptRejectInvite to backend", data);
@@ -38,7 +37,7 @@ class AllGroups extends Component {
     }
 
     componentDidMount() {
-        Axios.post(`${backendServer}/fetchGroups`, { user_id: JSON.parse(localStorage.getItem("userProfile")).id })
+        Axios.post(`${backendServer}/fetchGroups`, { user_id: getUserID() })
             .then(response => {
                 // console.log("response recieved from newgroup req", response);
                 this.setState({ groupsInfo: response.data })
@@ -50,17 +49,9 @@ class AllGroups extends Component {
     }
 
     render() {
-
-        const userProfile = localStorage.getItem("userProfile");
-        const userProfileJSON = JSON.parse(userProfile);
-        const groupsInfo = localStorage.getItem("groupsInfo");
-        const groupsInfoJSON = JSON.parse(groupsInfo);
-
-
+        const groupsInfoJSON = getGroupsInfo();
         return (
             <div style={{ width: '80%', margin: 'auto' }} >
-                {/* {localStorage.getItem("groupsInfo")}
-                {localStorage.getItem("userProfile")} */}
                 <input  list="groupDatalist"  style={{ width: '80%', marginRight: '10px' }} id="groupsSearch" onChange={(e) => this.setState({ selected: e.target.value,selectedItem:e.target })} type="text" placeholder="Search with Group name" />
                 <datalist onChange={(e) => console.log("onchange", e)} id="groupDatalist">
                     {this.state.groupsInfo && this.state.groupsInfo.map((element, index) =>

@@ -11,6 +11,7 @@ import logoSplitwise from "../../images/logo.png";
 import { logoutRedux } from "../../reduxOps/reduxActions/loginRedux";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
+import { getUserID, getUserName, getUserProfile } from "../Services/ControllerUtils";
 
 // import store from './../../store';
 
@@ -19,15 +20,11 @@ class Navbar extends Component {
     super(props);
   }
   render() {
-    // const state = store.getState();
-    const userProfile = localStorage.getItem("userProfile");
-    const userProfileJSON = JSON.parse(userProfile);
-    // var user = JSON.parse(localStorage.getItem("userProfile"));
-    var loggedIn = userProfileJSON && userProfileJSON.id ? true : false;
+    var loggedIn = getUserProfile() && getUserID()? true : false;
     console.log(
       "props from navbar",
       this.props,
-      localStorage.getItem("userProfile")
+      getUserProfile()
     );
     // console.log("prosp from navbar",this.props,state);
     console.log("LOGGED IN__________", loggedIn);
@@ -96,7 +93,7 @@ function PostLoginSnippet() {
                 textDecoration:'none'
               }}
             >
-              {JSON.parse(localStorage.getItem("userProfile")).name}
+              {getUserName()}
             </a>
             <OverlayTrigger
               placement="bottom"

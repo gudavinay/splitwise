@@ -302,7 +302,7 @@ app.post('/addExpense', async function (req, res) {
 
 app.post('/getAllExpenses', async function (req, res) {
     console.log(req.body);
-    var sql = `SELECT e.group_id,e.description,e.paid_by,e.paid_to,SUM(e.amount) as amount,e.settled,u.name AS paid_to_name,uu.name AS paid_by_name FROM expenses_table AS e INNER JOIN  user_profile_table AS u ON u.rec_id = e.paid_to INNER JOIN user_profile_table AS uu ON uu.rec_id = e.paid_by WHERE group_id='${req.body.group_id}' GROUP BY e.description ORDER BY e.rec_id desc`;
+    var sql = `SELECT e.group_id,e.description,e.paid_by,e.paid_to,SUM(e.amount) as amount,e.settled,u.name AS paid_to_name,uu.name AS paid_by_name,e.created_date FROM expenses_table AS e INNER JOIN  user_profile_table AS u ON u.rec_id = e.paid_to INNER JOIN user_profile_table AS uu ON uu.rec_id = e.paid_by WHERE group_id='${req.body.group_id}' GROUP BY e.description ORDER BY e.rec_id desc`;
     // var sql = `SELECT * FROM expenses_table where group_id='${req.body.group_id}'`;
     await connection.query(sql, function (error, result) {
         console.log("query executed successfully", sql, result, error);
@@ -323,7 +323,7 @@ app.post('/getAllExpenses', async function (req, res) {
 
 app.post('/getAllIndividualExpenses', async function (req, res) {
     console.log(req.body);
-    var sql = `SELECT * FROM expenses_table WHERE group_id='${req.body.group_id}'`;
+    var sql = `SELECT e.group_id,e.paid_to,u.name,e.settled,e.amount,e.created_date FROM expenses_table AS e INNER JOIN user_profile_table AS u ON e.paid_to=u.rec_id WHERE group_id='${req.body.group_id}'`;
     // var sql = `SELECT * FROM expenses_table where group_id='${req.body.group_id}'`;
     await connection.query(sql, function (error, result) {
         console.log("query executed successfully", sql, result, error);

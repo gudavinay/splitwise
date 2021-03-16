@@ -3,6 +3,7 @@ import '../../splitwise.css';
 import backendServer from '../../../webConfig'
 import Axios from 'axios';
 import { Link } from 'react-router-dom';
+import { getUserID } from '../../Services/ControllerUtils';
 class Sidebar extends Component {
     constructor(props) {
         super(props);
@@ -13,10 +14,8 @@ class Sidebar extends Component {
     }
 
     componentDidMount() {
-        let userProfile = localStorage.getItem("userProfile");
-        let userProfileJSON = JSON.parse(userProfile);
         const data = {
-            user_id: userProfileJSON.id
+            user_id: getUserID()
         }
         Axios.post(`${backendServer}/fetchGroups`, data)
             .then(response => {
