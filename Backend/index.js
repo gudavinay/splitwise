@@ -311,6 +311,23 @@ app.post('/settleUp', async function (req, res) {
     });
 });
 
+app.post('/updateUserProfile', async function (req, res) {
+    var sql = `UPDATE user_profile_table SET email='${req.body.email.toUpperCase()}', name='${req.body.name}', phone='${req.body.phone}', currency='${req.body.currency}', timezone='${req.body.timezone}', language='${req.body.language}' WHERE  rec_id=${req.body.id}`;
+    await connection.query(sql, function (error, result) {
+        if (error) {
+            res.writeHead(400, {
+                'Content-Type': 'text/plain'
+            });
+            res.end(error.code);
+        } else {
+            res.writeHead(200, {
+                'Content-Type': 'text/plain'
+            });
+            res.end(JSON.stringify(result));
+        }
+    });
+});
+
 
 //start your server on port 3001
 app.listen(3001);

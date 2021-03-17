@@ -62,6 +62,7 @@ class GroupInfo extends Component {
   }
 
   render() {
+    const userPreferredCurrency = getUserCurrency();
     const { id } = this.props.match.params;
     const currentGroupInfo = getGroupsInfo().find(group => group.group_id === Number(id));
     var userProfileJSON = getUserProfile();
@@ -115,9 +116,9 @@ class GroupInfo extends Component {
         Object.keys(userExpense).forEach(index => {
           let rowData = null;
           if(userExpense[index]<0){
-            rowData = (<Col><Row>{userExpenseNames[index]}</Row><Row><span style={{fontSize:'12px',padding:'0', color:'#5bc5a7'}}> gets back <span style={{fontSize:'14px',fontWeight:'bold'}}>{getUserCurrency()} {userExpense[index]*-1}</span></span></Row></Col>);
+            rowData = (<Col><Row>{userExpenseNames[index]}</Row><Row><span style={{fontSize:'12px',padding:'0', color:'#5bc5a7'}}> gets back <span style={{fontSize:'14px',fontWeight:'bold'}}>{userPreferredCurrency} {userExpense[index]*-1}</span></span></Row></Col>);
           }else if (userExpense[index] > 0){
-            rowData = (<Col><Row>{userExpenseNames[index]}</Row><Row><span style={{fontSize:'12px',padding:'0', color:'#ff652f'}}> owes <span style={{fontSize:'14px',fontWeight:'bold'}}>{getUserCurrency()} {userExpense[index]}</span></span></Row></Col>);
+            rowData = (<Col><Row>{userExpenseNames[index]}</Row><Row><span style={{fontSize:'12px',padding:'0', color:'#ff652f'}}> owes <span style={{fontSize:'14px',fontWeight:'bold'}}>{userPreferredCurrency} {userExpense[index]}</span></span></Row></Col>);
           }else{
             rowData = (<Col><Row>{userExpenseNames[index]}</Row><Row><span style={{fontSize:'12px',padding:'0', color:'#999'}}>settled up</span></Row></Col>);
           }
@@ -170,7 +171,7 @@ class GroupInfo extends Component {
                           <input type="text" className="form-control" name="description" onChange={(e) => this.setState({ description: e.target.value })} placeholder="Enter a description" title="Please enter a description" required />
                         </Row>
                         <Row style={{ marginTop: '1rem' }}>
-                          <Col sm={2} style={{margin:'auto'}}>{getUserCurrency()}</Col>
+                          <Col sm={2} style={{margin:'auto'}}>{userPreferredCurrency}</Col>
                           <Col><input type="number" className="form-control" step=".01" min="0" name="amount" onChange={(e) => {this.setState({ amount: Number(e.target.value).toFixed(2) });console.log(this.state.amount);}} pattern='(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$' placeholder="0.00" required />
                           </Col>
                         </Row>

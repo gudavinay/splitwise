@@ -39,17 +39,24 @@ class Sidebar extends Component {
     }
 
     render() {
+        // console.log("SIDEBARRRRRRR-------",this.props,this.state,this.props.location.pathname);
+        var dashboardActive,recentActivitiesActive,allGroupsActive = false;
+        if(this.props && this.props.location && this.props.location.pathname){
+            dashboardActive=this.props.location.pathname.includes("dashboard");
+            recentActivitiesActive=this.props.location.pathname.includes("recentActivities");
+            allGroupsActive=this.props.location.pathname.includes("allGroups");
+        }
         return (
             <React.Fragment>
                 <div style={{ paddingLeft: '45%' }}>
                     <div className="sidebarItem">
-                        <Link style={{ borderLeft: '6px solid #5bc5a7', color: '#5bc5a7', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none',paddingLeft:'4px' }} to="/home/s/dashboard"><img alt="" src={dashboardSVG}/> Dashboard</Link>
+                        <Link style={{ borderLeft: dashboardActive?'6px solid #5bc5a7':'#999', color: dashboardActive?'#5bc5a7':'#999', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none',paddingLeft:'4px' }} to="/home/s/dashboard"><img alt=""  src={dashboardSVG}/> Dashboard</Link>
                     </div>
                     <div className="sidebarItem">
-                        <Link style={{ borderLeft: '6px solid #5bc5a7', color: '#ff652f', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none',paddingLeft:'4px' }} to="/home/s/recentActivities"><img alt="" src={recentActivitiesSVG}/> Recent&nbsp;Activities</Link>
+                        <Link style={{ borderLeft: recentActivitiesActive?'6px solid #ff652f':'#999', color: recentActivitiesActive?'#ff652f':'#999', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none',paddingLeft:'4px' }} to="/home/s/recentActivities"><img alt="" src={recentActivitiesSVG}/> Recent&nbsp;Activities</Link>
                     </div>
                     <div className="sidebarItem">
-                        <Link style={{ borderLeft: '6px solid #5bc5a7', color: '#999', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none',paddingLeft:'4px' }} to="/home/s/allGroups" onClick={()=>this.setState({pendingGroupsToAcceptFlag:false})}><img alt="" src={allGroupsSVG}/> All&nbsp;Groups{this.state.pendingGroupsToAcceptFlag && <span style={{color:'indianred'}}>*</span>}</Link>
+                        <Link style={{ borderLeft: allGroupsActive?'6px solid #5bc5a7':'#999', color: allGroupsActive?'#5bc5a7':'#999', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none',paddingLeft:'4px' }} to="/home/s/allGroups" onClick={()=>this.setState({pendingGroupsToAcceptFlag:false})}><img alt="" src={allGroupsSVG}/> All&nbsp;Groups{this.state.pendingGroupsToAcceptFlag && <span style={{color:'indianred'}}>*</span>}</Link>
                     </div>
                     <br />
                     <hr />

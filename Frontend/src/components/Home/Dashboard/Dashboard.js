@@ -53,7 +53,8 @@ class Dashboard extends Component {
 
 
     render() {
-
+        const userPreferredCurrency = getUserCurrency();
+        const userID = getUserID();
         let arr = [];
         if (this.state.allUserExpenses && this.state.allUserExpenses.length > 0) {
             this.state.allUserExpenses.forEach(exp => {
@@ -70,12 +71,12 @@ class Dashboard extends Component {
                 userExpenseNames[expense.paid_to] = expense.name;
             })
             this.state.allUserExpenses.forEach(expense => {
-                if (expense.paid_to === getUserID())
+                if (expense.paid_to === userID)
                     userExpense[expense.paid_by] = (Number(userExpense[expense.paid_by]) - Number(expense.amount)).toFixed(2);
                 userExpenseTotal[expense.paid_by] = (Number(userExpenseTotal[expense.paid_by]) - Number(expense.amount)).toFixed(2);
             });
             this.state.allUserExpenses.forEach(expense => {
-                if (expense.paid_by === getUserID())
+                if (expense.paid_by === userID)
                     userExpense[expense.paid_to] = (Number(userExpense[expense.paid_to]) + Number(expense.amount)).toFixed(2);
                 userExpenseTotal[expense.paid_to] = (Number(userExpenseTotal[expense.paid_to]) + Number(expense.amount)).toFixed(2);
             });
@@ -89,23 +90,23 @@ class Dashboard extends Component {
 
         Object.keys(userExpense).forEach(index => {
             let rowData = null;
-            if (Number(index) !== getUserID()) {
+            if (Number(index) !== userID) {
                 if (userExpense[index] > 0) {
                     youAreOwed += Number(userExpense[index]);
-                    rowData = (<tr><td><Col><Row>{userExpenseNames[index]}</Row><Row><span style={{ fontSize: '12px', padding: '0', color: '#5bc5a7' }}> owes you<span style={{ fontSize: '14px', fontWeight: 'bold' }}>{getUserCurrency()} {userExpense[index]}</span></span></Row></Col></td></tr>);
+                    rowData = (<tr><td><Col><Row>{userExpenseNames[index]}</Row><Row><span style={{ fontSize: '12px', padding: '0', color: '#5bc5a7' }}> owes you<span style={{ fontSize: '14px', fontWeight: 'bold' }}> {userPreferredCurrency} {userExpense[index]}</span></span></Row></Col></td></tr>);
                     youAreOwedColumn.push(rowData);
                 }
                 if (userExpense[index] < 0) {
                     youOwe += Number(userExpense[index]);
-                    rowData = (<tr><td><Col><Row>{userExpenseNames[index]}</Row><Row><span style={{ fontSize: '12px', padding: '0', color: '#ff652f' }}> you owe <span style={{ fontSize: '14px', fontWeight: 'bold' }}>{getUserCurrency()} {userExpense[index] * -1}</span></span></Row></Col></td></tr>);
+                    rowData = (<tr><td><Col><Row>{userExpenseNames[index]}</Row><Row><span style={{ fontSize: '12px', padding: '0', color: '#ff652f' }}> you owe <span style={{ fontSize: '14px', fontWeight: 'bold' }}> {userPreferredCurrency} {userExpense[index] * -1}</span></span></Row></Col></td></tr>);
                     youOweColumn.push(rowData);
                 }
             }
         })
 
-        var totalBalance = userExpenseTotal[getUserID()] ? <span>{getUserCurrency()} {userExpenseTotal[getUserID()] * -1}</span> : "$ 0.00";
-        youOwe = <span>{getUserCurrency()} {Math.abs(youOwe.toFixed(2))}</span>
-        youAreOwed = <span>{getUserCurrency()} {Math.abs(youAreOwed.toFixed(2))}</span>
+        var totalBalance = userExpenseTotal[userID] ? <span>{userPreferredCurrency} {userExpenseTotal[userID] * -1}</span> : "$ 0";
+        youOwe = <span>{userPreferredCurrency} {Math.abs(youOwe.toFixed(2))}</span>
+        youAreOwed = <span>{userPreferredCurrency} {Math.abs(youAreOwed.toFixed(2))}</span>
 
         if (youOweColumn.length === 0) {
             youOweColumn = <span style={{ color: '#999' }}>You do not owe anything</span>
@@ -129,6 +130,7 @@ class Dashboard extends Component {
                     <Row>
                         <Col>
                             <h2><strong>Dashboard</strong></h2>
+                            
                         </Col>
                         <Col>
                             <Link className="btn btn-success" to="/home/newGroup" style={{ backgroundColor: '#FF6139', borderColor: '#FF6139', textDecoration: 'none' }}>Create a Group</Link>
@@ -153,7 +155,7 @@ class Dashboard extends Component {
                         </Col>
                     </Row>
                 </div>
-                <hr />
+                <hr style={{width:'98%'}}/>
                 <Row>
                     <Col>
                         <span style={{ color: '#999', fontWeight: 'bold' }}>YOU OWE</span>
@@ -172,7 +174,7 @@ class Dashboard extends Component {
                         {youAreOwedColumn}
                     </Col>
                 </Row>
-                <hr />
+                <hr style={{width:'98%'}}/>
                 <div>
                     <Modal show={this.state.show} onHide={() => this.setState({ show: false })}>
                         <Modal.Header closeButton style={{ background: '#5cc5a7', color: 'white' }}>
