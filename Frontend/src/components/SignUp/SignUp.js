@@ -10,7 +10,6 @@ import PropTypes from 'prop-types';
 import { Alert } from 'react-bootstrap';
 import { getUserProfile } from '../Services/ControllerUtils';
 
-//Define a Login Component
 class SignUp extends Component {
     constructor(props) {
         super(props);
@@ -31,13 +30,6 @@ class SignUp extends Component {
             password: this.state.password
         }
         await this.props.signupRedux(data);
-        // Axios.post(`${backendServer}/signup`, data)
-        //     .then(response => {
-        //         console.log(response);
-        //     })
-        //     .catch(error => {
-        //         console.log(error);
-        //     });
         this.setState({
             signupClicked: true
         })
@@ -79,23 +71,19 @@ class SignUp extends Component {
                                     <div class="form-group">
                                         <span style={{fontSize:'24px'}}>Hi there! My name is</span>
                                         <input type="text" class="form-control" onChange={(e) => {this.setState({ name: e.target.value });this.setState({open:true})}} name="name" placeholder="Full Name" title="Please enter valid Full Name" required />
-                                        {/* {this.state.name} */}
                                     </div>
                                     <Collapse in={this.state.open}>
                                         <div id="example-collapse-text">
                                             <div class="form-group">
                                                 Here’s my <strong>email address:</strong>
                                                 <input type="email" class="form-control" onChange={(e) => this.setState({ email: e.target.value })} name="email_id" placeholder="" pattern="^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$'%&*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])$" title="Please enter valid email address" required />
-                                                {/* {this.state.email} */}
                                             </div>
                                             <div class="form-group">
                                                 And here’s my <strong>password:</strong>
                                                 <input type="password" class="form-control" onChange={(e) => this.setState({ password: e.target.value })} name="password" placeholder="" required />
-                                                {/* {this.state.password} */}
                                             </div>
                                         </div>
                                     </Collapse>
-
                                     <button type="submit" class="btn btn-primary">Sign me up!</button><br /><br />
                                 </form>
                             </div>
@@ -120,6 +108,4 @@ const mapStateToProps = state =>{
     });
 }
 
-//export Login Component
-// export default SignUp;
 export default connect(mapStateToProps, {signupRedux})(SignUp);

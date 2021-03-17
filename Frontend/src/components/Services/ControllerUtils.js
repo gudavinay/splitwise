@@ -64,6 +64,3 @@ export function getMonthFromUtils(date){
 export function getDateFromUtils(date){
     return new Date(date).getDate();
 }
-
-// exports.findUserName = findUserName;
-// exports.currencyConverter = currencyConverter;

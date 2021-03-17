@@ -15,7 +15,6 @@ class Dashboard extends Component {
         };
     }
 
-
     componentDidMount() {
         Axios.get(`${backendServer}/fetchUsers`)
             .then(response => {
@@ -34,33 +33,22 @@ class Dashboard extends Component {
             .catch(error => {
                 console.log("error recieved from getallUserExpenses req", error);
             });
-
-        // Axios.post(`${backendServer}/getAllIndividualExpenses`, data)
-        //     .then(response => {
-        //         console.log("response recieved from getAllIndividualExpenses req", response);
-        //         this.setState({ allIndividualExpenses: response.data })
-        //     })
-        //     .catch(error => {
-        //         console.log("error recieved from getAllIndividualExpenses req", error);
-        //     });
     }
 
     onSubmit = async (event) => {
         event.preventDefault();
-        // console.log("to be settled with "+this.state.settleUpUser);
         const data = {
-          paid_by: "" + getUserID(),
-          paid_to: "" +this.state.settleUpUser
+            paid_by: "" + getUserID(),
+            paid_to: "" + this.state.settleUpUser
         };
         await Axios.post(`${backendServer}/settleUp`, data)
-          .then(response => {
-            console.log("response recieved from settleUp req", response);
-            this.setState({ show: false })
-          })
-          .catch(error => {
-            console.log("error recieved from settleUp req", error);
-            // this.setState({error:true})
-          });
+            .then(response => {
+                console.log("response recieved from settleUp req", response);
+                this.setState({ show: false })
+            })
+            .catch(error => {
+                console.log("error recieved from settleUp req", error);
+            });
     }
 
 
@@ -82,13 +70,13 @@ class Dashboard extends Component {
                 userExpenseNames[expense.paid_to] = expense.name;
             })
             this.state.allUserExpenses.forEach(expense => {
-                if(expense.paid_to === getUserID())
-                userExpense[expense.paid_by] = (Number(userExpense[expense.paid_by]) - Number(expense.amount)).toFixed(2);
+                if (expense.paid_to === getUserID())
+                    userExpense[expense.paid_by] = (Number(userExpense[expense.paid_by]) - Number(expense.amount)).toFixed(2);
                 userExpenseTotal[expense.paid_by] = (Number(userExpenseTotal[expense.paid_by]) - Number(expense.amount)).toFixed(2);
             });
             this.state.allUserExpenses.forEach(expense => {
-                if(expense.paid_by === getUserID())
-                userExpense[expense.paid_to] = (Number(userExpense[expense.paid_to]) + Number(expense.amount)).toFixed(2);
+                if (expense.paid_by === getUserID())
+                    userExpense[expense.paid_to] = (Number(userExpense[expense.paid_to]) + Number(expense.amount)).toFixed(2);
                 userExpenseTotal[expense.paid_to] = (Number(userExpenseTotal[expense.paid_to]) + Number(expense.amount)).toFixed(2);
             });
         }
@@ -96,13 +84,9 @@ class Dashboard extends Component {
         var youOweColumn = [];
         var youAreOwedColumn = [];
 
-        // var youOwe = userExpense[getUserID()] ? <span>{getUserCurrency()} {userExpense[getUserID()] * -1}</span> : "Calculating...";
-        // var youAreOwed = userExpense[getUserID()] ? <span>{getUserCurrency()} {userExpense[getUserID()] * -1}</span> : "Calculating...";
-
         var youOwe = 0;
         var youAreOwed = 0;
 
-        let groupBalances = [];
         Object.keys(userExpense).forEach(index => {
             let rowData = null;
             if (Number(index) !== getUserID()) {
@@ -123,25 +107,25 @@ class Dashboard extends Component {
         youOwe = <span>{getUserCurrency()} {Math.abs(youOwe.toFixed(2))}</span>
         youAreOwed = <span>{getUserCurrency()} {Math.abs(youAreOwed.toFixed(2))}</span>
 
-        if(youOweColumn.length===0){
-            youOweColumn = <span style={{color:'#999'}}>You do not owe anything</span>
+        if (youOweColumn.length === 0) {
+            youOweColumn = <span style={{ color: '#999' }}>You do not owe anything</span>
         }
 
-        if(youAreOwedColumn.length===0){
-            youAreOwedColumn = <span style={{color:'#999'}}>You are not owed anything</span>
+        if (youAreOwedColumn.length === 0) {
+            youAreOwedColumn = <span style={{ color: '#999' }}>You are not owed anything</span>
         }
 
         var payeeSelector = [(<option disabled selected>Select a user</option>)];
-        if(this.state.show){
+        if (this.state.show) {
             Object.keys(userExpenseNames).forEach(index => {
                 payeeSelector.push(<option key={index} value={index}>{userExpenseNames[index]}</option>)
             });
-            payeeSelector = (<select name="userSelect" id ="userSelect" onChange={(e)=>this.setState({settleUpUser:e.target.value})}>{payeeSelector}</select>)
+            payeeSelector = (<select name="userSelect" id="userSelect" onChange={(e) => this.setState({ settleUpUser: e.target.value })}>{payeeSelector}</select>)
         }
-        
+
         return (
             <React.Fragment>
-                <div style={{ background: '#eee', padding: '1rem' }}>
+                <div style={{ background: '#eee', padding: '1rem', borderRadius: '1rem', width: "98%" }}>
                     <Row>
                         <Col>
                             <h2><strong>Dashboard</strong></h2>
@@ -150,7 +134,6 @@ class Dashboard extends Component {
                             <Link className="btn btn-success" to="/home/newGroup" style={{ backgroundColor: '#FF6139', borderColor: '#FF6139', textDecoration: 'none' }}>Create a Group</Link>
                         </Col>
                         <Col>
-                            {/* <Link className="btn btn-success" to="/home/settle" style={{ backgroundColor:'#5bc5a7' ,borderColor:'#5bc5a7'}}>Settle up</Link> */}
                             <Button onClick={() => this.setState({ show: true })} className="btn btn-success" style={{ backgroundColor: '#5bc5a7', borderColor: '#5bc5a7' }}>Settle up</Button>
                         </Col>
                     </Row>
@@ -173,10 +156,10 @@ class Dashboard extends Component {
                 <hr />
                 <Row>
                     <Col>
-                        <span style={{color:'#999', fontWeight:'bold'}}>YOU OWE</span>
+                        <span style={{ color: '#999', fontWeight: 'bold' }}>YOU OWE</span>
                     </Col>
                     <Col>
-                        <span style={{color:'#999', fontWeight:'bold'}}>YOU ARE OWED</span>
+                        <span style={{ color: '#999', fontWeight: 'bold' }}>YOU ARE OWED</span>
                     </Col>
                 </Row>
                 <Row>
@@ -200,12 +183,6 @@ class Dashboard extends Component {
                                 <center>
                                     <form onSubmit={this.onSubmit}>
                                         <Row><span><strong>You</strong> paid {payeeSelector}</span></Row>
-                                        {/* <Row style={{ marginTop: '1rem',width:'40%' }}>
-                                            <Col sm={2} style={{margin:'auto'}}>{getUserCurrency()}</Col>
-                                            <Col>
-                                                <input type="number" className="form-control" step=".01" min="0" name="amount" onChange={(e) => {this.setState({ amount: Number(e.target.value).toFixed(2) });console.log(this.state.amount);}} pattern='(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$' placeholder="0.00" required />
-                                            </Col>
-                                        </Row> */}
                                         <Button style={{ margin: '1rem', borderColor: '#5bc5a7', backgroundColor: 'white', color: '#5bc5a7' }} onClick={() => this.setState({ show: false })} >Cancel</Button>
                                         <Button style={{ margin: '1rem', backgroundColor: '#5bc5a7', borderColor: '#5bc5a7' }} type="submit">Save</Button>
                                     </form>
@@ -214,12 +191,6 @@ class Dashboard extends Component {
                         </Modal.Body>
                     </Modal>
                 </div>
-                {/* {arr}<hr />
-                {JSON.stringify(userExpense)}<hr />
-                {JSON.stringify(userExpenseNames)}<hr />
-                {groupBalances} */}
-
-
             </React.Fragment>
         );
     }

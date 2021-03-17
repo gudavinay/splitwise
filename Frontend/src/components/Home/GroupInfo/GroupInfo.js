@@ -3,8 +3,9 @@ import { Button, Col, Modal, Row, Table } from "react-bootstrap";
 import Axios from 'axios';
 import backendServer from '../../../webConfig'
 import {currencyConverter, getUserID, getUserProfile, getUserCurrency, getGroupsInfo, getMonthFromUtils, getDateFromUtils} from '../../Services/ControllerUtils'
-// import { useParams } from 'react-router-dom';
 import "../../splitwise.css";
+import notesSVG from '../../assets/notes.svg'
+
 class GroupInfo extends Component {
   constructor(props) {
     super(props);
@@ -16,8 +17,6 @@ class GroupInfo extends Component {
       allExpenses: null,
       group_id: this.props.match.params.id
     };
-
-    console.log("constructor in groups ****************");
   }
 
   onSubmit = async (event) => {
@@ -62,26 +61,7 @@ class GroupInfo extends Component {
     });
   }
 
-  
-
-  // componentWillUpdate() {
-  //   console.log("updated");
-
-  //   const data = {
-  //     group_id: this.props.match.params.id
-  //   };
-  //   console.log(this.props,this.state);
-  //   Axios.post(`${backendServer}/getAllExpenses`, data)
-  //     .then(response => {
-  //       console.log("response recieved from getAllExpenses req", response);
-  //       this.setState({ allExpenses: response.data })
-  //     })
-  //     .catch(error => {
-  //       console.log("error recieved from getAllExpenses req", error);
-  //     });
-  // }
   render() {
-    // let {id} = useParams();
     const { id } = this.props.match.params;
     const currentGroupInfo = getGroupsInfo().find(group => group.group_id === Number(id));
     var userProfileJSON = getUserProfile();
@@ -101,7 +81,6 @@ class GroupInfo extends Component {
                   </Col>
                 <Col sm={7} style={{margin:'auto'}}>{expense.description}</Col>
                 <Col sm={4} style={{color:'#999'}}><strong>{expense.paid_by===userProfileJSON.id?`You `:expense.paid_by_name}</strong> paid<br /><span style={{color:'black'}}><strong>{currencyConverter(userProfileJSON.currency)} {expense.amount}</strong></span></Col>
-                {/* <Col sm={2}>Paid By<br />{expense.paid_to_name}</Col> */}
               </Row>
             </td>
           </tr>
@@ -115,9 +94,6 @@ class GroupInfo extends Component {
     let userExpenseNames = {};
     let groupBalances = "No data found.";
     if(this.state.allIndividualExpenses && this.state.allIndividualExpenses.length > 0&& this.state.allIndividualExpenses[0] && this.state.allIndividualExpenses[0].group_id && this.state.allExpenses && this.state.allExpenses.length > 0 && this.state.allExpenses[0] && this.state.allExpenses[0].group_id){
-      // this.state.allIndividualExpenses.forEach((expense,index)=>{
-      //   userExpense[expense.paid_by] = 
-      // });
       this.state.allExpenses.forEach(expense =>{
         userExpense[expense.paid_by] = 0;
         userExpenseNames[expense.paid_by] = expense.name;
@@ -146,17 +122,11 @@ class GroupInfo extends Component {
             rowData = (<Col><Row>{userExpenseNames[index]}</Row><Row><span style={{fontSize:'12px',padding:'0', color:'#999'}}>settled up</span></Row></Col>);
           }
           groupBalances.push(rowData);
-          // groupBalances.push(<Row>
-          //     {userExpenseNames[index]} {userExpense[index]}
-          //   </Row>)
         })
     }
 
-
-    // console.log("url params in groupinfo - ", id);
     return (
       <React.Fragment>
-        {/* you're in group {id} */}
         <Row>
           <Col sm={8}>
           <Table bordered hover style={{ width: '100%', margin: 'auto' }}>
@@ -171,7 +141,6 @@ class GroupInfo extends Component {
                     <Button onClick={() => this.setState({ show: true })} className="btn btn-success" style={{ backgroundColor: '#FF6139', borderColor: '#FF6139', textDecoration: 'none' ,margin:'0px 10px'}}>Add an expense</Button>
                   </Col>
                 </Row>
-                 
               </td>
             </tr>
             {tableData}
@@ -183,11 +152,6 @@ class GroupInfo extends Component {
             {groupBalances}
           </Col>
         </Row>
-        {/* {JSON.stringify(this.state.allExpenses)}<br/><br/>
-        {JSON.stringify(this.state.allIndividualExpenses)} */}
-
-
-        {/* {JSON.stringify(this.state.allExpenses)} */}
         <div>
           <Modal show={this.state.show} onHide={() => this.setState({ show: false })}>
             <Modal.Header closeButton style={{ background: '#5cc5a7', color: 'white' }}>
@@ -199,11 +163,7 @@ class GroupInfo extends Component {
                   <form onSubmit={this.onSubmit}>
                     <Row>
                       <Col>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="6rem" height="6rem" fill="currentColor" class="bi bi-journal-text" viewBox="0 0 16 16">
-                          <path d="M5 10.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z" />
-                          <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2z" />
-                          <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1z" />
-                        </svg>
+                      <img alt="" src={notesSVG}/>
                       </Col>
                       <Col>
                         <Row style={{ width: '100%' }}>
@@ -222,16 +182,8 @@ class GroupInfo extends Component {
                     <Row>
                       {this.state.error && <span style={{ color: 'indianred' }}>Error Occured</span>}
                     </Row>
-
                     <Button style={{ margin: '1rem', borderColor: '#5bc5a7', backgroundColor: 'white', color: '#5bc5a7' }} onClick={() => this.setState({ show: false })} >Cancel</Button>
                     <Button style={{ margin: '1rem', backgroundColor: '#5bc5a7', borderColor: '#5bc5a7' }} type="submit">Save</Button>
-
-                    {/* <Button variant="secondary" onClick={() => this.setState({ show: false })}>
-                      Cancel
-              </Button>
-                    <Button variant="primary" type="submit" onClick={() => this.setState({ show: false })}>
-                      Save
-              </Button> */}
                   </form>
                 </center>
               </React.Fragment>

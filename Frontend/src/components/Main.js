@@ -12,7 +12,6 @@ import UserProfile from "./Home/UserProfile/UserProfile";
 import NewGroup from "./Home/NewGroup/NewGroup";
 import GroupInfo from "./Home/GroupInfo/GroupInfo";
 import AllGroups from "./Home/AllGroups/AllGroups";
-//Create a Main Component
 class Main extends Component {
   constructor(props) {
     super(props);
@@ -20,20 +19,15 @@ class Main extends Component {
       val: "",
     };
   }
-  // myFunc = (x) => {
-  //     console.log("inside myFunc",x);
-  // }
   render() {
     return (
       <React.Fragment>
-        {/*Render Different Component based on Route*/}
           <Route exact path="/" component={LandingPage} />
           <Route  path="/login" component={Login} />
           <Route  path="/signup" component={SignUp} />
           <Route  path="/home" component={Home} />
           <Route  path="/home/userProfile" component={UserProfile} />
           <Route  path="/home/newGroup" component={NewGroup} />
-          {/* <Container> */}
           <Row>
             <Col sm={3}>
               <Route path="/home/s" component={Sidebar}></Route>
@@ -45,11 +39,8 @@ class Main extends Component {
               <Route path="/home/s/allGroups" component={AllGroups} />
             </Col>
           </Row>
-        {/* </Container> */}
-        {/* <Route render={() => <Redirect to={{pathname: "/"}} />} /> */}
       </React.Fragment>
     );
   }
 }
-//Export The Main Component
 export default Main;

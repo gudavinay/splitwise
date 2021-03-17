@@ -64,11 +64,9 @@ class Login extends Component {
                                 <form onSubmit={this.onSubmit} method="post">
                                     <div className="form-group">
                                         <input type="email" className="form-control" onChange={(e) => this.setState({ email: e.target.value })} name="email_id" placeholder="Email Id" pattern="^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$'%&*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])$" title="Please enter valid email address" required />
-                                        {/* {this.state.email} */}
                                     </div>
                                     <div className="form-group">
                                         <input type="password" className="form-control" onChange={(e) => this.setState({ password: e.target.value })} name="password" placeholder="Password" required />
-                                        {/* {this.state.password} */}
                                     </div>
                                     <button type="submit" className="btn btn-primary">Sign in</button><br /><br />
                                 </form>
@@ -94,6 +92,4 @@ const mapStateToProps = state =>{
     });
 }
 
-//export Login Component
 export default connect(mapStateToProps, {loginRedux})(Login);
-// export default Login;
