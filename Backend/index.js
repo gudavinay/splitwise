@@ -64,19 +64,14 @@ app.get('/', function (req, res) {
 //Route to handle Post Request Call
 app.post('/login', async function (req, res) {
     if (req.body.email && req.body.password) {
-        // console.log(`select rec_id, password from user_profile_table where UPPER(email) = '${req.body.email.toUpperCase()}' 
-        // AND password = '${passwordHash.generate(req.body.password)}'`);
         await connection.query(`select * from user_profile_table where UPPER(email) = '${req.body.email.toUpperCase()}'`, (err, result) => {
-            // console.log("XXXXXXXX", err, result);
             if (err) {
                 res.writeHead(500, {
                     'Content-Type': 'text/plain'
                 });
                 res.send("Database Error");
             } else {
-                // console.log("result[0]",result[0]);
                 if (result[0] && passwordHash.verify(req.body.password, result[0]['password'])) {
-                    // console.log("match");
                     res.writeHead(200, {
                         'Content-Type': 'text/plain'
                     })
@@ -92,7 +87,6 @@ app.post('/login', async function (req, res) {
                     }
                     res.end(JSON.stringify(userObj));
                 } else {
-                    // console.log("dont match");
                     res.writeHead(200, {
                         'Content-Type': 'text/plain'
                     })
@@ -105,25 +99,16 @@ app.post('/login', async function (req, res) {
 
 
 app.post('/signup', async function (req, res) {
-    console.log("inside signup");
-    // console.log(req.body);
     if (req.body.name && req.body.email && req.body.password) {
         var sql = `INSERT INTO user_profile_table (email, name, password) VALUES ('${req.body.email.toUpperCase()}', '${req.body.name}', '${passwordHash.generate(req.body.password)}');`;
         await connection.query(sql, async function (error, results) {
-            console.log("query executed successfully", sql, results);
             if (error) {
                 res.writeHead(200, {
                     'Content-Type': 'text/plain'
                 });
-                // console.log(error.code);
                 res.end(error.code);
             } else {
-                // res.writeHead(200, {
-                //     'Content-Type': 'text/plain'
-                // });
-                console.log(`SELECT * from user_profile_table where UPPER(email)='${req.body.email}'`);
                 await connection.query(`SELECT * from user_profile_table where UPPER(email)='${req.body.email.toUpperCase()}'`, function (error, result) {
-                    console.log("XXXXXXXX", error, result);
                     if (error) {
                         res.writeHead(500, {
                             'Content-Type': 'text/plain'
@@ -144,8 +129,6 @@ app.post('/signup', async function (req, res) {
                     }
                 });
             }
-
-            // res.end("User added successfully!");
         });
     }
 });
@@ -153,12 +136,9 @@ app.post('/signup', async function (req, res) {
 
 
 app.get('/fetchUsers', async function (req, res) {
-    console.log(req.body);
-    // if (req.body.name && req.body.email && req.body.password) {
     var sql = `SELECT rec_id, email, name from user_profile_table;`;
     await connection.query(sql, function (error, result) {
         console.log("query executed successfully", sql, result);
-        // console.log("test res",result[0]);
         if (error) {
             res.writeHead(200, {
                 'Content-Type': 'text/plain'
@@ -170,16 +150,12 @@ app.get('/fetchUsers', async function (req, res) {
         });
         res.end(JSON.stringify(result));
     });
-    // }
 });
 
 app.post('/fetchGroups', async function (req, res) {
-    console.log(req.body);
-    // if (req.body.name && req.body.email && req.body.password) {
     var sql = `SELECT * FROM user_group_table AS UGT JOIN group_info_table AS GIT ON GIT.rec_id = UGT.group_id WHERE user_id=${req.body.user_id}`;
     await connection.query(sql, function (error, result) {
         console.log("query executed successfully", sql, result);
-        // console.log("test res",result[0]);
         if (error) {
             res.writeHead(200, {
                 'Content-Type': 'text/plain'
@@ -191,15 +167,11 @@ app.post('/fetchGroups', async function (req, res) {
         });
         res.end(JSON.stringify(result));
     });
-    // }
 });
 
 app.post('/newGroup', async function (req, res) {
-    console.log(req.body);
     var sql = `INSERT into group_info_table (name, admin_email) VALUES('${req.body.groupName}','${req.body.email}')`;
     await connection.query(sql, function (error, result) {
-        console.log("query executed successfully", sql, result, error);
-        // console.log("test res",result[0]);
         if (error) {
             res.writeHead(200, {
                 'Content-Type': 'text/plain'
@@ -209,32 +181,11 @@ app.post('/newGroup', async function (req, res) {
             res.writeHead(200, {
                 'Content-Type': 'text/plain'
             });
-            //check same group name condition
-            // console.log("logggg");
-            // console.log(result);
-            // console.log(result[0]);
-            // console.log(result.affectedRows);
-            // console.log(result.OkPacket.insertId);
-            // console.log(result['OkPacket']);
-            // console.log("logggg");
-            // console.log(result);
-
             if (req.body.userIDArray && result.affectedRows == 1) {
                 req.body.userIDArray.forEach(user => {
                     var tempSql = `INSERT into user_group_table (user_id,group_id,isAccepted) VALUES('${user}','${result.insertId}','${user == req.body.user_rec_id ? 1 : 0}')`;
                     connection.query(tempSql, function (err, res) {
-                        console.log("Inner query executed successfully", tempSql, res, err);
-                        // if (error) {
-                        //     res.writeHead(200, {
-                        //         'Content-Type': 'text/plain'
-                        //     });
-                        //     res.end(JSON.stringify(err));
-                        // } else {
-                        //     res.writeHead(200, {
-                        //         'Content-Type': 'text/plain'
-                        //     });
-                        //     res.end(JSON.stringify(res));
-                        // }
+                        // console.log("Inner query executed successfully", tempSql, res, err);
                     });
                 });
             }
@@ -244,11 +195,8 @@ app.post('/newGroup', async function (req, res) {
 });
 
 app.post('/acceptInvite', async function (req, res) {
-    console.log(req.body);
     var sql = `UPDATE user_group_table set isAccepted = ${req.body.isAccepted} where user_id = '${req.body.user_id}' AND group_id='${req.body.group_id}'`;
     await connection.query(sql, function (error, result) {
-        console.log("query executed successfully", sql, result, error);
-        // console.log("test res",result[0]);
         if (error) {
             res.writeHead(200, {
                 'Content-Type': 'text/plain'
@@ -264,11 +212,9 @@ app.post('/acceptInvite', async function (req, res) {
 });
 
 app.post('/addExpense', async function (req, res) {
-    console.log(req.body);
     if (req.body.group_id && req.body.description && req.body.amount && req.body.paid_by) {
         var groupSQL = `SELECT user_id FROM user_group_table where group_id = '${req.body.group_id}' and isAccepted=1`;
         await connection.query(groupSQL, function (error, result) {
-            console.log("query executed successfully", groupSQL, result, error);
             if (error) {
                 res.writeHead(200, {
                     'Content-Type': 'text/plain'
@@ -281,17 +227,13 @@ app.post('/addExpense', async function (req, res) {
                 if (result.length>0) {
                     var splitAmount = (req.body.amount/result.length).toFixed(2);
                     var unevenSplit = (req.body.amount - (result.length-1)*splitAmount).toFixed(2);
-                    // console.log(result.length,req.body.amount,splitAmount,unevenSplit);
                     result.forEach((user,index) => {
-                        // console.log(index==result.length-1?unevenSplit:splitAmount);
-                        var tempSql = `INSERT into expenses_table (group_id, description, paid_by, paid_to, amount, settled) VALUES(${req.body.group_id},'${req.body.description}',${req.body.paid_by},${user.user_id},'${index==result.length-1?unevenSplit:splitAmount}','No')`;
+                        var tempSql = `INSERT into expenses_table (group_id, description, paid_by, paid_to, amount, settled) VALUES(${req.body.group_id},'${req.body.description}',${req.body.paid_by},${user.user_id},'${index==result.length-1?unevenSplit:splitAmount}','N')`;
                         connection.query(tempSql, function (err, res) {
-                            console.log("Inner query executed successfully", tempSql, res, err);
+                            // console.log("Inner query executed successfully", tempSql, res, err);
                         });
                     });
                 }
-
-
                 res.end(JSON.stringify(result));
             }
         });
@@ -301,12 +243,8 @@ app.post('/addExpense', async function (req, res) {
 
 
 app.post('/getAllExpenses', async function (req, res) {
-    console.log(req.body);
-    var sql = `SELECT e.group_id,e.description,e.paid_by,e.paid_to,SUM(e.amount) as amount,e.settled,u.name AS paid_to_name,uu.name AS paid_by_name,e.created_date FROM expenses_table AS e INNER JOIN  user_profile_table AS u ON u.rec_id = e.paid_to INNER JOIN user_profile_table AS uu ON uu.rec_id = e.paid_by WHERE group_id='${req.body.group_id}' GROUP BY e.description ORDER BY e.rec_id desc`;
-    // var sql = `SELECT * FROM expenses_table where group_id='${req.body.group_id}'`;
+    var sql = `SELECT e.group_id,e.description,e.paid_by,e.paid_to,SUM(e.amount) as amount,e.settled,u.name AS paid_to_name,uu.name AS paid_by_name,e.created_date FROM expenses_table AS e INNER JOIN  user_profile_table AS u ON u.rec_id = e.paid_to INNER JOIN user_profile_table AS uu ON uu.rec_id = e.paid_by WHERE group_id='${req.body.group_id}' and e.settled='N' GROUP BY e.description ORDER BY e.rec_id desc`;
     await connection.query(sql, function (error, result) {
-        console.log("query executed successfully", sql, result, error);
-        // console.log("test res",result[0]);
         if (error) {
             res.writeHead(200, {
                 'Content-Type': 'text/plain'
@@ -322,12 +260,8 @@ app.post('/getAllExpenses', async function (req, res) {
 });
 
 app.post('/getAllIndividualExpenses', async function (req, res) {
-    console.log(req.body);
-    var sql = `SELECT e.group_id,e.paid_to,u.name,e.settled,e.amount,e.created_date FROM expenses_table AS e INNER JOIN user_profile_table AS u ON e.paid_to=u.rec_id WHERE group_id='${req.body.group_id}'`;
-    // var sql = `SELECT * FROM expenses_table where group_id='${req.body.group_id}'`;
+    var sql = `SELECT e.group_id,e.paid_to,u.name,e.settled,e.amount,e.created_date FROM expenses_table AS e INNER JOIN user_profile_table AS u ON e.paid_to=u.rec_id WHERE group_id='${req.body.group_id}' and e.settled='N'`;
     await connection.query(sql, function (error, result) {
-        console.log("query executed successfully", sql, result, error);
-        // console.log("test res",result[0]);
         if (error) {
             res.writeHead(200, {
                 'Content-Type': 'text/plain'
@@ -343,12 +277,26 @@ app.post('/getAllIndividualExpenses', async function (req, res) {
 });
 
 app.post('/getAllUserExpenses', async function (req, res) {
-    console.log(req.body);
-    var sql = `SELECT e.group_id,e.description,e.paid_by,e.paid_to,u.name,e.settled,e.amount,e.created_date FROM expenses_table AS e INNER JOIN user_profile_table AS u ON e.paid_to=u.rec_id WHERE group_id in (SELECT group_id from user_group_table where user_id = '${req.body.user_id}') order by e.created_date desc`;
-    // var sql = `SELECT * FROM expenses_table where group_id='${req.body.group_id}'`;
+    var sql = `SELECT e.group_id,e.description,e.paid_by,e.paid_to,u.name,e.settled,e.amount,e.created_date FROM expenses_table AS e INNER JOIN user_profile_table AS u ON e.paid_to=u.rec_id WHERE group_id in (SELECT group_id from user_group_table where user_id = '${req.body.user_id}')  and e.settled='N' order by e.created_date desc`;
     await connection.query(sql, function (error, result) {
-        console.log("query executed successfully", sql, result, error);
-        // console.log("test res",result[0]);
+        if (error) {
+            res.writeHead(200, {
+                'Content-Type': 'text/plain'
+            });
+            res.end(error.code);
+        } else {
+            res.writeHead(200, {
+                'Content-Type': 'text/plain'
+            });
+            res.end(JSON.stringify(result));
+        }
+    });
+});
+
+
+app.post('/settleUp', async function (req, res) {
+    var sql = `UPDATE expenses_table SET settled='Y', updated_date=NOW() WHERE (paid_by=${req.body.paid_by} and paid_to=${req.body.paid_to}) or (paid_by=${req.body.paid_to} and paid_to=${req.body.paid_by})`;
+    await connection.query(sql, function (error, result) {
         if (error) {
             res.writeHead(200, {
                 'Content-Type': 'text/plain'

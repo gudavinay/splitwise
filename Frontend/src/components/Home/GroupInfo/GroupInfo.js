@@ -211,7 +211,7 @@ class GroupInfo extends Component {
                         </Row>
                         <Row style={{ marginTop: '1rem' }}>
                           <Col sm={2} style={{margin:'auto'}}>{getUserCurrency()}</Col>
-                          <Col><input type="number" className="form-control" min="0" name="amount" onChange={(e) => this.setState({ amount: e.target.value })} placeholder="0.00" title="Please enter valid Full Name" pattern='(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$' required />
+                          <Col><input type="number" className="form-control" step=".01" min="0" name="amount" onChange={(e) => {this.setState({ amount: Number(e.target.value).toFixed(2) });console.log(this.state.amount);}} pattern='(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$' placeholder="0.00" required />
                           </Col>
                         </Row>
                       </Col>
