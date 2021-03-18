@@ -4,7 +4,8 @@ import Axios from 'axios';
 import backendServer from '../../../webConfig'
 import {currencyConverter, getUserID, getUserProfile, getUserCurrency, getGroupsInfo, getMonthFromUtils, getDateFromUtils} from '../../Services/ControllerUtils'
 import "../../splitwise.css";
-import notesSVG from '../../assets/notes.svg'
+import notesSVG from '../../assets/notes.svg';
+import { Link } from "react-router-dom";
 
 class GroupInfo extends Component {
   constructor(props) {
@@ -31,6 +32,7 @@ class GroupInfo extends Component {
       .then(response => {
         console.log("response recieved from addExpense req", response);
         this.setState({ show: false })
+        window.location.reload();
       })
       .catch(error => {
         console.log("error recieved from addExpense req", error);
@@ -63,10 +65,10 @@ class GroupInfo extends Component {
 
   render() {
     const userPreferredCurrency = getUserCurrency();
+    let disableExitGroup = false;
     const { id } = this.props.match.params;
     const currentGroupInfo = getGroupsInfo().find(group => group.group_id === Number(id));
     var userProfileJSON = getUserProfile();
-
     console.log("props in groupinfo", this.props, this.state);
     let tableData = "No data found. Please try adding an expense.";
     if (this.state.allExpenses && this.state.allExpenses.length > 0 && this.state.allExpenses[0] && this.state.allExpenses[0].group_id) {
@@ -116,8 +118,10 @@ class GroupInfo extends Component {
         Object.keys(userExpense).forEach(index => {
           let rowData = null;
           if(userExpense[index]<0){
+            disableExitGroup = true;
             rowData = (<Col><Row>{userExpenseNames[index]}</Row><Row><span style={{fontSize:'12px',padding:'0', color:'#5bc5a7'}}> gets back <span style={{fontSize:'14px',fontWeight:'bold'}}>{userPreferredCurrency} {userExpense[index]*-1}</span></span></Row></Col>);
           }else if (userExpense[index] > 0){
+            disableExitGroup = true;
             rowData = (<Col><Row>{userExpenseNames[index]}</Row><Row><span style={{fontSize:'12px',padding:'0', color:'#ff652f'}}> owes <span style={{fontSize:'14px',fontWeight:'bold'}}>{userPreferredCurrency} {userExpense[index]}</span></span></Row></Col>);
           }else{
             rowData = (<Col><Row>{userExpenseNames[index]}</Row><Row><span style={{fontSize:'12px',padding:'0', color:'#999'}}>settled up</span></Row></Col>);
@@ -149,7 +153,22 @@ class GroupInfo extends Component {
         </Table>
           </Col>
           <Col>
-            <span style={{color:'#999', fontWeight:'bold'}}>GROUP BALANCES</span><br/>
+          <div>
+            <Link to={"/home/editGroup/"+id} className="btn" style={{fontSize:'12px', color:'indianred', borderColor:'indianred', padding:'0px 10px',margin:'5px 32px'}}>Edit Group</Link>
+          </div>
+          <div>
+            <Link to="/home/s/dashboard" onClick={async (e)=>{
+              await Axios.post(`${backendServer}/exitGroup`, {group_id:id,user_id:getUserID()})
+              .then(response => {
+                console.log("response recieved from exitGroup req", response);
+                this.props.history.push("/home/s/dashboard");
+              })
+              .catch(error => {
+                console.log("error recieved from exitGroup req", error);
+              });
+            }}variant="danger" disabled={disableExitGroup} style={{fontSize:'12px', borderColor:'indianred', padding:'0px 10px',margin:'5px 27px'}}>Delete Group</Link>
+          </div>
+          <div style={{color:'#999', fontWeight:'bold'}}>GROUP BALANCES</div>
             {groupBalances}
           </Col>
         </Row>
@@ -172,7 +191,7 @@ class GroupInfo extends Component {
                         </Row>
                         <Row style={{ marginTop: '1rem' }}>
                           <Col sm={2} style={{margin:'auto'}}>{userPreferredCurrency}</Col>
-                          <Col><input type="number" className="form-control" step=".01" min="0" name="amount" onChange={(e) => {this.setState({ amount: Number(e.target.value).toFixed(2) });console.log(this.state.amount);}} pattern='(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$' placeholder="0.00" required />
+                          <Col><input type="number" className="form-control" step=".01" min="0.01" max="99999999.99" name="amount" onChange={(e) => {this.setState({ amount: Number(e.target.value).toFixed(2) });console.log(this.state.amount);}} pattern='(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$' placeholder="0.00" required />
                           </Col>
                         </Row>
                       </Col>
@@ -191,6 +210,8 @@ class GroupInfo extends Component {
             </Modal.Body>
           </Modal>
         </div>
+        {/* {JSON.stringify(this.state.allIndividualExpenses)}
+        {JSON.stringify(this.state.allExpenses)} */}
       </React.Fragment>
     );
   }

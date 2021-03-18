@@ -6,7 +6,8 @@ import backendServer from '../../../webConfig';
 import logoSmall from '../../../images/logoSmall.png';
 import '../../splitwise.css'
 import { getUserEmail, getUserID, getUserName } from '../../Services/ControllerUtils';
-import crossSVG from '../../assets/cross.svg'
+import crossSVG from '../../assets/cross.svg';
+import profileImage from '../../../images/profileImage.png'
 
 class NewGroup extends Component {
     constructor(props) {
@@ -16,7 +17,7 @@ class NewGroup extends Component {
             resp: [],
             open: false,
             defaultCount: 4,
-            selectedList: [(getUserName() + " / " +  getUserEmail())],
+            selectedList: [(getUserName().toLowerCase() + " / " +  getUserEmail().toLowerCase())],
             selected: null
         };
     }
@@ -64,7 +65,7 @@ class NewGroup extends Component {
                                     </Row>
                                     <Row>
                                         <Col>
-                                            <input style={{width:'80%', marginRight:'10px'}} id="newGroupPersons" onChange={(e) => this.setState({ selected: e.target.value })} type="text" list="email" placeholder="Search with Name or Email address"/>
+                                            <input style={{width:'51%', marginRight:'10px'}} id="newGroupPersons" onChange={(e) => this.setState({ selected: e.target.value })} type="text" list="email" placeholder="Search with Name or Email address"/>
                                             <datalist onChange={(e) => console.log("onchange", e)} id="email">
                                                 {this.state.resp.map((element, index) =>
                                                     <option key={element.id} value={element.id}>{element.name} / {element.email}</option>
@@ -80,11 +81,11 @@ class NewGroup extends Component {
                                         </Col>
                                     </Row>
                                     <Row>
-                                        <ol style={{width:'80%', marginTop:'1rem'}}>
+                                        <div style={{width:'55%', marginTop:'1rem'}}>
                                             {this.state.selectedList.map(user => (
-                                                <Row>
+                                                <Row style={{height:'40px'}}>
                                                     <Col sm={10}>
-                                                        <li key={user}>{user}</li>
+                                                        <div key={user}> <img style={{borderRadius:'25px', height:'30px'}} src={profileImage} alt=""/> {user}</div>
                                                     </Col>
                                                     <Col sm={2}>
                                                         { !user.includes(getUserEmail()) && <a onClick={(e)=>{
@@ -101,7 +102,7 @@ class NewGroup extends Component {
                                                     </Col>
                                                 </Row>
                                             ))}
-                                        </ol>
+                                        </div>
                                     </Row>
                                     <hr/>
                                     <Row>
@@ -125,6 +126,7 @@ class NewGroup extends Component {
                                                 Axios.post(`${backendServer}/newGroup`, data)
                                                 .then(response => {
                                                     console.log("response recieved from newgroup req", response);
+                                                    this.props.history.push("/home/s/dashboard")
                                                 })
                                                 .catch(error => {
                                                     console.log("error recieved from newgroup req", error);

@@ -104,7 +104,7 @@ class Dashboard extends Component {
             }
         })
 
-        var totalBalance = userExpenseTotal[userID] ? <span>{userPreferredCurrency} {userExpenseTotal[userID] * -1}</span> : "$ 0";
+        var totalBalance = userExpenseTotal[userID] ? <span>{userPreferredCurrency} {userExpenseTotal[userID] * -1}</span> : userPreferredCurrency+" 0";
         youOwe = <span>{userPreferredCurrency} {Math.abs(youOwe.toFixed(2))}</span>
         youAreOwed = <span>{userPreferredCurrency} {Math.abs(youAreOwed.toFixed(2))}</span>
 

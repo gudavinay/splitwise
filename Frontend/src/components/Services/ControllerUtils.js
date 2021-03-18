@@ -30,7 +30,7 @@ export function getUserID(){
 }
 
 export function getUserEmail(){
-    return getUserProfile().email;
+    return getUserProfile().email.toLowerCase();
 }
 
 export function getUserName(){
@@ -58,9 +58,19 @@ export function getUserCurrency(){
 }
 
 export function getMonthFromUtils(date){
-    return months[new Date(date).getMonth()];
+    let localDate = new Date(new Date(date).setHours(new Date(date).getHours()-7))
+    return months[localDate.getMonth()];
 }
 
 export function getDateFromUtils(date){
-    return new Date(date).getDate();
+    let localDate = new Date(new Date(date).setHours(new Date(date).getHours()-7))
+    return localDate.getDate();
+}
+
+export function fetchGroupName(group_id){
+    let groupData = getGroupsInfo();
+    if(groupData && groupData.length!==0){
+        return groupData.find(group=>group.group_id === Number(group_id)).name;
+    }
+    
 }

@@ -136,9 +136,9 @@ app.post('/signup', async function (req, res) {
 
 
 app.get('/fetchUsers', async function (req, res) {
-    var sql = `SELECT rec_id, email, name from user_profile_table;`;
+    var sql = `SELECT rec_id, LOWER(email) as email, LOWER(name) as name from user_profile_table;`;
     await connection.query(sql, function (error, result) {
-        console.log("query executed successfully", sql, result);
+        // console.log("query executed successfully", sql, result);
         if (error) {
             res.writeHead(200, {
                 'Content-Type': 'text/plain'
@@ -155,7 +155,7 @@ app.get('/fetchUsers', async function (req, res) {
 app.post('/fetchGroups', async function (req, res) {
     var sql = `SELECT * FROM user_group_table AS UGT JOIN group_info_table AS GIT ON GIT.rec_id = UGT.group_id WHERE user_id=${req.body.user_id}`;
     await connection.query(sql, function (error, result) {
-        console.log("query executed successfully", sql, result);
+        // console.log("query executed successfully", sql, result);
         if (error) {
             res.writeHead(200, {
                 'Content-Type': 'text/plain'
@@ -213,6 +213,7 @@ app.post('/acceptInvite', async function (req, res) {
 
 app.post('/addExpense', async function (req, res) {
     if (req.body.group_id && req.body.description && req.body.amount && req.body.paid_by) {
+        // TODO check error
         var groupSQL = `SELECT user_id FROM user_group_table where group_id = '${req.body.group_id}' and isAccepted=1`;
         await connection.query(groupSQL, function (error, result) {
             if (error) {
@@ -238,7 +239,6 @@ app.post('/addExpense', async function (req, res) {
             }
         });
     }
-
 });
 
 
@@ -280,7 +280,7 @@ app.post('/getAllUserExpenses', async function (req, res) {
     var sql = `SELECT e.group_id,e.description,e.paid_by,e.paid_to,u.name,e.settled,e.amount,e.created_date FROM expenses_table AS e INNER JOIN user_profile_table AS u ON e.paid_to=u.rec_id WHERE group_id in (SELECT group_id from user_group_table where user_id = '${req.body.user_id}')  and e.settled='N' order by e.created_date desc`;
     await connection.query(sql, function (error, result) {
         if (error) {
-            res.writeHead(200, {
+            res.writeHead(400, {
                 'Content-Type': 'text/plain'
             });
             res.end(error.code);
@@ -327,6 +327,87 @@ app.post('/updateUserProfile', async function (req, res) {
         }
     });
 });
+
+
+app.post('/getAllUserExpensesForRecentActivities', async function (req, res) {
+    var sql = `SELECT e.group_id,g.name as group_name,e.description,e.paid_by,e.paid_to,u.name,e.settled,SUM(e.amount) as amount,e.created_date, e.updated_date FROM expenses_table AS e INNER JOIN user_profile_table AS u ON e.paid_to=u.rec_id INNER JOIN group_info_table as g ON g.rec_id=e.group_id WHERE group_id in (SELECT group_id from user_group_table where user_id = '${req.body.user_id}') group by e.description order by e.updated_date desc, e.created_date desc`;
+    await connection.query(sql, function (error, result) {
+        if (error) {
+            res.writeHead(400, {
+                'Content-Type': 'text/plain'
+            });
+            res.end(error.code);
+        } else {
+            res.writeHead(200, {
+                'Content-Type': 'text/plain'
+            });
+            res.end(JSON.stringify(result));
+        }
+    });
+});
+
+
+app.post('/getGroupMembers', async function (req, res) {
+    console.log(req.body);
+    var sql = `SELECT DISTINCT u.user_id,p.name as name,p.email as email FROM user_group_table AS u INNER JOIN user_profile_table AS p ON p.rec_id=u.user_id WHERE u.group_id='${req.body.group_id}'`;
+    await connection.query(sql, function (error, result) {
+        console.log(error,result);
+        if (error) {
+            res.writeHead(400, {
+                'Content-Type': 'text/plain'
+            });
+            res.end(error.code);
+        } else {
+            res.writeHead(200, {
+                'Content-Type': 'text/plain'
+            });
+            res.end(JSON.stringify(result));
+        }
+    });
+});
+
+
+app.post('/updateGroup', async function (req, res) {
+    console.log(req.body);
+    var sql = `UPDATE group_info_table SET name='${req.body.name}' WHERE rec_id='${req.body.group_id}'`;
+    await connection.query(sql, function (error, result) {
+        console.log(sql,result,error);
+        console.log(error,result);
+        if (error) {
+            res.writeHead(400, {
+                'Content-Type': 'text/plain'
+            });
+            res.end(error.code);
+        } else {
+            res.writeHead(200, {
+                'Content-Type': 'text/plain'
+            });
+            res.end(JSON.stringify(result));
+        }
+    });
+});
+
+
+app.post('/exitGroup', async function (req, res) {
+    console.log(req.body);
+    var sql = `DELETE from user_group_table where user_id='${req.body.user_id}' and group_id='${req.body.group_id}'`;
+    await connection.query(sql, function (error, result) {
+        console.log(sql,result,error);
+        console.log(error,result);
+        if (error) {
+            res.writeHead(400, {
+                'Content-Type': 'text/plain'
+            });
+            res.end(error.code);
+        } else {
+            res.writeHead(200, {
+                'Content-Type': 'text/plain'
+            });
+            res.end(JSON.stringify(result));
+        }
+    });
+});
+
 
 
 //start your server on port 3001

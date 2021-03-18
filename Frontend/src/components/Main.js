@@ -12,6 +12,7 @@ import UserProfile from "./Home/UserProfile/UserProfile";
 import NewGroup from "./Home/NewGroup/NewGroup";
 import GroupInfo from "./Home/GroupInfo/GroupInfo";
 import AllGroups from "./Home/AllGroups/AllGroups";
+import EditGroup from "./Home/EditGroup/EditGroup";
 class Main extends Component {
   constructor(props) {
     super(props);
@@ -28,6 +29,7 @@ class Main extends Component {
           <Route  path="/home" component={Home} />
           <Route  path="/home/userProfile" component={UserProfile} />
           <Route  path="/home/newGroup" component={NewGroup} />
+          <Route  path="/home/editGroup/:id" component={EditGroup} />
           <Row>
             <Col sm={3}>
               <Route path="/home/s" component={Sidebar}></Route>
