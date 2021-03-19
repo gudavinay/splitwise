@@ -84,7 +84,7 @@ class SignUp extends Component {
                                             </div>
                                         </div>
                                     </Collapse>
-                                    <button type="submit" class="btn btn-primary">Sign me up!</button><br /><br />
+                                    <button type="submit" class="btn btn-primary" style={{backgroundColor:'#FF6139',borderColor:'#FF6139'}}>Sign me up!</button><br /><br />
                                 </form>
                             </div>
                         </Col>

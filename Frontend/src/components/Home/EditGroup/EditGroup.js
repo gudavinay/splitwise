@@ -3,10 +3,9 @@ import React, { Component } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import Axios from 'axios';
 import backendServer from '../../../webConfig';
-import logoSmall from '../../../images/logoSmall.png';
 import '../../splitwise.css'
 import profileImage from '../../../images/profileImage.png'
-import { fetchGroupName } from '../../Services/ControllerUtils'
+import { fetchGroupName, fetchGroupProfilePicture } from '../../Services/ControllerUtils'
 
 class EditGroup extends Component {
     constructor(props) {
@@ -14,6 +13,7 @@ class EditGroup extends Component {
         this.state = {
             groupName: fetchGroupName(this.props.match.params.id),
             changedGroupName: fetchGroupName(this.props.match.params.id),
+            profilePicture: fetchGroupProfilePicture(this.props.match.params.id),
             selectedList: [],
         };
     }
@@ -40,7 +40,7 @@ class EditGroup extends Component {
                 <Container>
                     <Row>
                         <Col>
-                            <img src={logoSmall} alt="logo" style={{ height: '65%', width: '50%', margin: '6rem', marginLeft: '12rem' }} />
+                            <img src={backendServer+"/user/"+this.state.profilePicture} alt="logo" style={{ height: '65%', width: '50%', margin: '6rem', marginLeft: '12rem' }} />
                         </Col>
                         <Col>
                             <Row>

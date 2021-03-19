@@ -187,7 +187,7 @@ app.post('/fetchGroups', async function (req, res) {
 });
 
 app.post('/newGroup', async function (req, res) {
-    var sql = `INSERT into group_info_table (name, admin_email) VALUES('${req.body.groupName}','${req.body.email}')`;
+    var sql = `INSERT into group_info_table (name, admin_email, profile_picture_url) VALUES('${req.body.groupName}','${req.body.email}','${req.body.profilePicture}')`;
     await connection.query(sql, function (error, result) {
         if (error) {
             res.writeHead(200, {
@@ -365,10 +365,10 @@ app.post('/getAllUserExpensesForRecentActivities', async function (req, res) {
 
 
 app.post('/getGroupMembers', async function (req, res) {
-    console.log(req.body);
+    // console.log(req.body);
     var sql = `SELECT DISTINCT u.user_id,p.name as name,p.email as email FROM user_group_table AS u INNER JOIN user_profile_table AS p ON p.rec_id=u.user_id WHERE u.group_id='${req.body.group_id}'`;
     await connection.query(sql, function (error, result) {
-        console.log(error,result);
+        // console.log(error,result);
         if (error) {
             res.writeHead(400, {
                 'Content-Type': 'text/plain'
@@ -462,3 +462,5 @@ app.post('/uploadUserProfilePicture', (req, res) => {
 //start your server on port 3001
 app.listen(3001);
 console.log("Server Listening on port 3001");
+
+module.exports = app;

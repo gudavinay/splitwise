@@ -76,5 +76,10 @@ export function fetchGroupName(group_id){
     if(groupData && groupData.length!==0){
         return groupData.find(group=>group.group_id === Number(group_id)).name;
     }
-    
+}
+export function fetchGroupProfilePicture(group_id){
+    let groupData = getGroupsInfo();
+    if(groupData && groupData.length!==0){
+        return groupData.find(group=>group.group_id === Number(group_id)).profilePicture;
+    }
 }

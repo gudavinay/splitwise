@@ -33,6 +33,16 @@ class NewGroup extends Component {
             });
     }
 
+
+    uploadImage = (e) => {
+        if (e.target.files)
+            this.setState({
+                file: e.target.files[0],
+                fileText: e.target.files[0].name
+            })
+    }
+
+
     render() {
         return (
             <React.Fragment>
@@ -40,6 +50,25 @@ class NewGroup extends Component {
                     <Row>
                         <Col>
                             <img src={logoSmall} alt="logo" style={{ height: '65%', width: '50%', margin: '6rem',marginLeft:'12rem' }} />
+                            <Row style={{marginTop:'10px',margin:'auto', width:'60%'}}>
+                                        <Col sm={9}>
+                                            <input style={{fontSize:'12px'}} className="form-control" type="file" name="profilepicture" accept="image/*" onChange={this.uploadImage} />
+                                        </Col>
+                                        <Col sm={3}>
+                                        <Button onClick={()=>{
+                                    let formData = new FormData();
+                                    formData.append('myImage', this.state.file);
+                                    const config={headers:{'content-type':'multipart/form-data'}};
+                                    Axios.post("/uploadUserProfilePicture",formData,config).then(response=>{
+                                        alert("file uploaded successfully");
+                                        this.setState({uploadedFile:response.data})
+                                    },error=>{
+                                        // this.setState
+                                    })
+                                }} disabled={!this.state.file} style={{ margin: 'auto', backgroundColor: '#FF6139', borderColor: '#FF6139',fontSize:'12px' }} >Upload</Button><br/>
+                                        </Col>
+                                
+                                    </Row>
                         </Col>
                         <Col>
                             <Row>
@@ -121,7 +150,8 @@ class NewGroup extends Component {
                                                     groupName:this.state.groupName,
                                                     email: getUserEmail(),
                                                     user_rec_id: getUserID(),
-                                                    userIDArray:userIDArray
+                                                    userIDArray:userIDArray,
+                                                    profilePicture: this.state.uploadedFile,
                                                 }
                                                 Axios.post(`${backendServer}/newGroup`, data)
                                                 .then(response => {

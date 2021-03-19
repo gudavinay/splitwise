@@ -68,7 +68,7 @@ class Login extends Component {
                                     <div className="form-group">
                                         <input type="password" className="form-control" onChange={(e) => this.setState({ password: e.target.value })} name="password" placeholder="Password" required />
                                     </div>
-                                    <button type="submit" className="btn btn-primary">Sign in</button><br /><br />
+                                    <button type="submit" className="btn btn-primary" style={{backgroundColor:'#FF6139',borderColor:'#FF6139'}}>Sign in</button><br /><br />
                                 </form>
                             </div>
                         </Col>
