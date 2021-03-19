@@ -46,6 +46,15 @@ class Sidebar extends Component {
             recentActivitiesActive=this.props.location.pathname.includes("recentActivities");
             allGroupsActive=this.props.location.pathname.includes("allGroups");
         }
+        // console.log("in sidebar checking for ghoups",this.state);
+        var errorMsg = <span style={{color:'#999'}}>You do not have any groups yet.</span>;
+            this.state.groups.forEach(group=>{
+                console.log("in loop",group);
+                if(group.isAccepted === 1){
+                    errorMsg="";
+                }
+            })
+
         return (
             <React.Fragment>
                 <div style={{ paddingLeft: '45%' }}>
@@ -61,10 +70,11 @@ class Sidebar extends Component {
                     <br />
                     <hr />
                 </div>
-                <div style={{ paddingLeft: '45%' }}>
+                <div style={{ paddingLeft: '45%', fontSize:'11px' }}>
                     <div className="sidebarHeading">
                         GROUPS
                     </div>
+                    {errorMsg}
                     {this.state.groups.map(function (group, index) {
                         if (group.isAccepted === 1) {
                             return <div className="sidebarItem" >

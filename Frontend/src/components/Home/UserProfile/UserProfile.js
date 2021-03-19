@@ -1,7 +1,7 @@
 import { Button } from 'react-bootstrap';
 import React, { Component } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { getUserEmail, getUserName, getUserPhone, getUserCurrencyDesc, getUserTimezone, getUserLanguage, getUserID } from '../../Services/ControllerUtils';
+import { getUserEmail, getUserName, getUserPhone, getUserCurrencyDesc, getUserTimezone, getUserLanguage, getUserID, getProfilePicture } from '../../Services/ControllerUtils';
 // import store from '../../../store'
 import backendServer from '../../../webConfig'
 import Axios from 'axios';
@@ -39,7 +39,7 @@ class UserProfile extends Component {
             currency: this.state.currency,
             language: this.state.language,
             timezone: this.state.timezone,
-            profilePicture: null,
+            profilePicture: this.state.uploadedFile,
             id: getUserID()
         };
         console.log(this.state);
@@ -65,8 +65,28 @@ class UserProfile extends Component {
                             <Col >
                                 <center>
                                     <h2>Your account</h2>
-                                    <img src="https://png.pngtree.com/png-vector/20191023/ourlarge/pngtree-user-vector-icon-with-white-background-png-image_1849343.jpg" style={{ height: '100%', width: '100%' }} alt="profilephoto" />
-                                    <input className="form-control" type="file" name="profilepicture" accept="image/*" onChange={this.uploadImage} />
+                                    {/* <img src="https://png.pngtree.com/png-vector/20191023/ourlarge/pngtree-user-vector-icon-with-white-background-png-image_1849343.jpg" style={{ height: '100%', width: '100%' }} alt="profilephoto" /> */}
+                                    <img src={backendServer+"/user/"+getProfilePicture()} style={{ height: '100%', width: '100%' }} alt="profilephoto" />
+                                    <Row>
+                                        <Col sm={9}>
+                                            <input style={{fontSize:'12px'}} className="form-control" type="file" name="profilepicture" accept="image/*" onChange={this.uploadImage} />
+                                        </Col>
+                                        <Col sm={3}>
+                                        <Button onClick={()=>{
+                                    let formData = new FormData();
+                                    formData.append('myImage', this.state.file);
+                                    const config={headers:{'content-type':'multipart/form-data'}};
+                                    Axios.post("/uploadUserProfilePicture",formData,config).then(response=>{
+                                        alert("file success upload");
+                                        this.setState({uploadedFile:response.data})
+                                    },error=>{
+                                        // this.setState
+                                    })
+                                }} disabled={!this.state.file} style={{ margin: 'auto', backgroundColor: '#FF6139', borderColor: '#FF6139',fontSize:'12px' }} >Upload</Button><br/>
+                                        </Col>
+                                
+                                    </Row>
+                                    
                                 </center>
                             </Col>
                             <Col style={{ margin: '5rem' }}>
@@ -88,7 +108,7 @@ class UserProfile extends Component {
                                     Your phone number
                             </Row>
                                 <Row>
-                                    <input type="tel" className="form-control" onChange={(e) => this.setState({ phone: e.target.value })} name="phone" title="Please enter valid phone number" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" value={this.state.phone} required />
+                                    <input type="tel" className="form-control" onChange={(e) => this.setState({ phone: e.target.value })} name="phone" title="Please enter valid phone number" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" value={this.state.phone} />
                                 </Row>
                             </Col>
                             <Col style={{ marginTop: '5rem' }}>

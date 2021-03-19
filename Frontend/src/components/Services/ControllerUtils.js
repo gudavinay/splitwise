@@ -53,6 +53,10 @@ export function getUserLanguage(){
     return getUserProfile().language;
 }
 
+export function getProfilePicture(){
+    return getUserProfile().profilePicture;
+}
+
 export function getUserCurrency(){
     return currencyConverter(getUserProfile().currency);
 }

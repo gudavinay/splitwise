@@ -44,7 +44,7 @@ class Dashboard extends Component {
         await Axios.post(`${backendServer}/settleUp`, data)
             .then(response => {
                 console.log("response recieved from settleUp req", response);
-                this.setState({ show: false })
+                window.location.reload();
             })
             .catch(error => {
                 console.log("error recieved from settleUp req", error);

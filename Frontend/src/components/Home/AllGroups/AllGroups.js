@@ -8,6 +8,7 @@ import { getUserID, getUserEmail, getUserName, getGroupsInfo } from '../../Servi
 import groupRedirectorSVG from '../../assets/groupRedirector.svg'
 import acceptedInviteSVG from '../../assets/acceptedInvite.svg'
 import rejectedInviteSVG from '../../assets/rejectedInvite.svg'
+import searchSVG from '../../assets/search.svg'
 
 class AllGroups extends Component {
     constructor(props) {
@@ -33,6 +34,7 @@ class AllGroups extends Component {
         Axios.post(`${backendServer}/acceptInvite`, data)
             .then(response => {
                 console.log("response recieved from newgroup req", response);
+                window.location.reload();
             })
             .catch(error => {
                 console.log("error recieved from newgroup req", error);
@@ -62,7 +64,7 @@ class AllGroups extends Component {
                 </datalist>
                 <Button style={{ backgroundColor:'#FF6139' ,borderColor:'#FF6139',textDecoration:'none'}} disabled={!this.state.selected} onClick={(event) => {
                     this.props.history.push('/home/s/group/'+this.state.groupsInfo.find(group=> group.name === this.state.selected).group_id);
-                }}>Add</Button>
+                }}><img src={searchSVG} alt=""/></Button>
                 <hr />
                 {groupsInfoJSON && groupsInfoJSON.length===0 && <span style={{fontWeight:'bold', color:'#999'}}>No groups found. Please try creating a group in dashboard.</span>}
                 <Table striped borderless >

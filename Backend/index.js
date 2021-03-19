@@ -9,6 +9,7 @@ var mysql = require('mysql');
 app.set('view engine', 'ejs');
 var constants = require("./config.json");
 const passwordHash = require('password-hash');
+const path = require('path');
 
 //use cors to allow cross origin resource sharing
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
@@ -37,6 +38,21 @@ app.use(function (req, res, next) {
     next();
 });
 
+const multer = require('multer');
+const fs = require('fs');
+const storage = multer.diskStorage({
+  destination: './public/uploads/',
+  filename: function(req, file, cb){
+    cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+    storage: storage,
+    limits:{fileSize: 1000000},
+  }).single('myImage');
+  app.use(express.static('./public'));
+  
 // var connection = mysql.createConnection({
 var connection = mysql.createPool({
     host: constants.DB.host,
@@ -57,9 +73,9 @@ connection.getConnection((err) => {
 });
 
 //Route to handle Post Request Call
-app.get('/', function (req, res) {
-    console.log("hello splitwise");
-});
+// app.get('/', function (req, res) {
+//     console.log("hello splitwise");
+// });
 
 //Route to handle Post Request Call
 app.post('/login', async function (req, res) {
@@ -312,7 +328,7 @@ app.post('/settleUp', async function (req, res) {
 });
 
 app.post('/updateUserProfile', async function (req, res) {
-    var sql = `UPDATE user_profile_table SET email='${req.body.email.toUpperCase()}', name='${req.body.name}', phone='${req.body.phone}', currency='${req.body.currency}', timezone='${req.body.timezone}', language='${req.body.language}' WHERE  rec_id=${req.body.id}`;
+    var sql = `UPDATE user_profile_table SET email='${req.body.email.toUpperCase()}', name='${req.body.name}', phone='${req.body.phone}', currency='${req.body.currency}', timezone='${req.body.timezone}', language='${req.body.language}',profile_picture_url='${req.body.profilePicture}' WHERE  rec_id=${req.body.id}`;
     await connection.query(sql, function (error, result) {
         if (error) {
             res.writeHead(400, {
@@ -330,7 +346,7 @@ app.post('/updateUserProfile', async function (req, res) {
 
 
 app.post('/getAllUserExpensesForRecentActivities', async function (req, res) {
-    var sql = `SELECT e.group_id,g.name as group_name,e.description,e.paid_by,e.paid_to,u.name,e.settled,SUM(e.amount) as amount,e.created_date, e.updated_date FROM expenses_table AS e INNER JOIN user_profile_table AS u ON e.paid_to=u.rec_id INNER JOIN group_info_table as g ON g.rec_id=e.group_id WHERE group_id in (SELECT group_id from user_group_table where user_id = '${req.body.user_id}') group by e.description order by e.updated_date desc, e.created_date desc`;
+    var sql = `SELECT e.group_id,g.name as group_name,e.description,e.paid_by,e.paid_to,u.name,e.settled,SUM(e.amount) as amount,e.created_date, e.updated_date FROM expenses_table AS e INNER JOIN user_profile_table AS u ON e.paid_by=u.rec_id INNER JOIN group_info_table as g ON g.rec_id=e.group_id WHERE group_id in (SELECT group_id from user_group_table where user_id = '${req.body.user_id}') group by e.description order by e.updated_date desc, e.created_date desc`;
     await connection.query(sql, function (error, result) {
         if (error) {
             res.writeHead(400, {
@@ -408,6 +424,50 @@ app.post('/exitGroup', async function (req, res) {
     });
 });
 
+app.post('/uploadUserProfilePicture', (req, res) => {
+    console.log(req.body);
+    upload(req, res, async (err) => {
+        console.log("qweqweqweqwe        ",req.file,req.file.filename);
+      if(err){
+        res.writeHead(200, {
+            'Content-Type': 'text/plain'
+        })
+        res.end("error");
+      } else {
+        if(req.file == undefined){
+            res.writeHead(200, {
+                'Content-Type': 'text/plain'
+            })
+            res.end("no file");
+        } else {
+            res.writeHead(200, {
+                'Content-Type': 'text/plain'
+            })
+            // console.log(path.join(__dirname) + '/public/uploads/'+req.file.filename);
+            // var sql = `UPDATE user_profile_table set profile_picture_url = '${req.file.filename}'`;
+            // await connection.query(sql, function (error, result) {
+            //     console.log(sql,result,error);
+            // });
+
+            // res.sendFile(path.join(__dirname) + '/public/uploads/'+req.file.filename);
+            // res.send(req.file);
+            res.end(req.file.filename);
+        }
+      }
+    });
+  });
+
+  app.get('/user/:id',(req,res)=>{
+    //   console.log(req.params);
+      var image = path.join(__dirname)+'/public/uploads/'+req.params.id;
+    //   console.log(image);
+      if(fs.existsSync(image)){
+          res.sendFile(image);
+      }
+      else{
+          res.sendFile(path.join(__dirname) + '/public/uploads/defaultProfilePicture.png')
+      }
+  });
 
 
 //start your server on port 3001
