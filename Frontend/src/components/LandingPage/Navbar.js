@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { getUserID, getUserName, getUserProfile } from "../Services/ControllerUtils";
 import logoSVG from '../assets/logo.svg'
 import logoutSVG from '../assets/logout.svg'
+import profileImage from '../../images/profileImage.png'
 
 // import store from './../../store';
 
@@ -44,7 +45,7 @@ function PreLoginSnippet() {
       <Container>
         <Row style={{margin:'0% 3%'}}>
           <Col>
-          <Link to="/"><img alt="" style={{height:'100%'}} src={logoSVG}/>
+          <Link to="/"><img alt="" style={{height:'100%',width:'25%'}} src={logoSVG}/>
           </Link>
           </Col>
           <Col style={{textAlign:'right'}}>
@@ -69,19 +70,20 @@ function PostLoginSnippet() {
                 alt="Splitwise Logo"
               /></Link>
           </Col>
-          <Col style={{textAlign:'right',margin:'1%'}}>
-            <a
+          <Col style={{textAlign:'right',display:'flex', justifyContent:'flex-end'}}>
+            <div><a
               href="/home/userProfile"
               style={{
                 margin: "1rem",
                 color: "whitesmoke",
                 fontSize: "20px",
                 fontWeight: "bold",
-                textDecoration:'none'
+                textDecoration:'none',
+                display:'flex'
               }}
             >
-              {getUserName()}
-            </a>
+              <div><img style={{borderRadius:'25px', height:'30px', margin:'0px 8px'}} src={profileImage} alt=""/></div><div style={{marginTop:'2px'}}>{getUserName()}</div>
+            </a></div>
             <OverlayTrigger
               placement="bottom"
               overlay={
@@ -91,7 +93,7 @@ function PostLoginSnippet() {
               }
             >
               <a
-                style={{ color: "whitesmoke" }}
+                style={{ color: "whitesmoke", display:'flex' }}
                 href="/"
                 onClick={(e) => {
                   window.localStorage.clear();

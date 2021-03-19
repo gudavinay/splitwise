@@ -59,7 +59,8 @@ var connection = mysql.createPool({
     user: constants.DB.username,
     password: constants.DB.password,
     port: constants.DB.port,
-    database: constants.DB.database
+    database: constants.DB.database,
+    // connectionLimit:500
 });
 // connection.connect(function(err){
 //     if(err) throw err;
@@ -425,9 +426,7 @@ app.post('/exitGroup', async function (req, res) {
 });
 
 app.post('/uploadUserProfilePicture', (req, res) => {
-    console.log(req.body);
     upload(req, res, async (err) => {
-        console.log("qweqweqweqwe        ",req.file,req.file.filename);
       if(err){
         res.writeHead(200, {
             'Content-Type': 'text/plain'
@@ -443,14 +442,6 @@ app.post('/uploadUserProfilePicture', (req, res) => {
             res.writeHead(200, {
                 'Content-Type': 'text/plain'
             })
-            // console.log(path.join(__dirname) + '/public/uploads/'+req.file.filename);
-            // var sql = `UPDATE user_profile_table set profile_picture_url = '${req.file.filename}'`;
-            // await connection.query(sql, function (error, result) {
-            //     console.log(sql,result,error);
-            // });
-
-            // res.sendFile(path.join(__dirname) + '/public/uploads/'+req.file.filename);
-            // res.send(req.file);
             res.end(req.file.filename);
         }
       }
@@ -458,9 +449,7 @@ app.post('/uploadUserProfilePicture', (req, res) => {
   });
 
   app.get('/user/:id',(req,res)=>{
-    //   console.log(req.params);
       var image = path.join(__dirname)+'/public/uploads/'+req.params.id;
-    //   console.log(image);
       if(fs.existsSync(image)){
           res.sendFile(image);
       }

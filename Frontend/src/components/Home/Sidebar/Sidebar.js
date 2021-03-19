@@ -78,7 +78,7 @@ class Sidebar extends Component {
                     {this.state.groups.map(function (group, index) {
                         if (group.isAccepted === 1) {
                             return <div className="sidebarItem" >
-                                <a key={index} href={"/home/s/group/"+group.group_id} style={{ color: '#999', fontWeight: 'bold', textDecoration: 'none' }}><img alt="" src={groupTagSVG}/> {group.name}</a>
+                                <a key={index} href={"/home/s/group/"+group.group_id} style={{ color: '#999', fontWeight: 'bold', textDecoration: 'none' ,fontSize:'14px'}}><img alt="" src={groupTagSVG}/> {group.name}</a>
                                 </div>
                         } else {
                             return <React.Fragment></React.Fragment>

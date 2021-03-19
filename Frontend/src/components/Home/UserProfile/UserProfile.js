@@ -17,6 +17,7 @@ class UserProfile extends Component {
             currency: getUserCurrencyDesc(),
             language: getUserLanguage(),
             timezone: getUserTimezone(),
+            profilePicture:getProfilePicture(),
             saveSuccess:false,
             saveFailed:false,
         }
@@ -67,7 +68,7 @@ class UserProfile extends Component {
                                     <h2>Your account</h2>
                                     {/* <img src="https://png.pngtree.com/png-vector/20191023/ourlarge/pngtree-user-vector-icon-with-white-background-png-image_1849343.jpg" style={{ height: '100%', width: '100%' }} alt="profilephoto" /> */}
                                     <img src={backendServer+"/user/"+getProfilePicture()} style={{ height: '100%', width: '100%' }} alt="profilephoto" />
-                                    <Row>
+                                    <Row style={{marginTop:'10px'}}>
                                         <Col sm={9}>
                                             <input style={{fontSize:'12px'}} className="form-control" type="file" name="profilepicture" accept="image/*" onChange={this.uploadImage} />
                                         </Col>
@@ -77,7 +78,7 @@ class UserProfile extends Component {
                                     formData.append('myImage', this.state.file);
                                     const config={headers:{'content-type':'multipart/form-data'}};
                                     Axios.post("/uploadUserProfilePicture",formData,config).then(response=>{
-                                        alert("file success upload");
+                                        alert("file uploaded successfully");
                                         this.setState({uploadedFile:response.data})
                                     },error=>{
                                         // this.setState

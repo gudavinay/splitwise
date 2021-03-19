@@ -56,7 +56,7 @@ class AllGroups extends Component {
         const groupsInfoJSON = getGroupsInfo();
         return (
             <div style={{ width: '80%', margin: 'auto' }} >
-                <input  list="groupDatalist"  style={{ width: '80%', marginRight: '10px' }} id="groupsSearch" onChange={(e) => this.setState({ selected: e.target.value,selectedItem:e.target })} type="text" placeholder="Search with Group name" />
+                <input  list="groupDatalist"  style={{ width: '25%', marginRight: '10px' }} id="groupsSearch" onChange={(e) => this.setState({ selected: e.target.value,selectedItem:e.target })} type="text" placeholder="Search with Group name" />
                 <datalist onChange={(e) => console.log("onchange", e)} id="groupDatalist">
                     {this.state.groupsInfo && this.state.groupsInfo.map((element, index) =>
                         <option key={element.group_id} value={element.name}>{element.name}</option>

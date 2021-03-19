@@ -186,7 +186,7 @@ class Dashboard extends Component {
                                     <form onSubmit={this.onSubmit}>
                                         <Row><span><strong>You</strong> paid {payeeSelector}</span></Row>
                                         <Button style={{ margin: '1rem', borderColor: '#5bc5a7', backgroundColor: 'white', color: '#5bc5a7' }} onClick={() => this.setState({ show: false })} >Cancel</Button>
-                                        <Button style={{ margin: '1rem', backgroundColor: '#5bc5a7', borderColor: '#5bc5a7' }} type="submit">Save</Button>
+                                        <Button style={{ margin: '1rem', backgroundColor: '#5bc5a7', borderColor: '#5bc5a7' }} type="submit">Settle</Button>
                                     </form>
                                 </center>
                             </React.Fragment>
