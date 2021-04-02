@@ -107,7 +107,7 @@ app.post('/login', async function (req, res) {
                     res.writeHead(200, {
                         'Content-Type': 'text/plain'
                     })
-                    res.end("Unscuccessful Login");
+                    res.end("Unsuccessful Login");
                 }
             }
         });

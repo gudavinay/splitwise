@@ -1,0 +1,25 @@
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
+// TODO
+// _someId: Schema.Types.ObjectId,
+const ExpensesSchema = new mongoose.Schema(
+    {
+        group_id:[{ type: Schema.Types.ObjectId, ref:"GroupInfo" }],
+        description:{
+            type: String
+        },
+        paid_by:[{ type: Schema.Types.ObjectId, ref:"UserProfile" }],
+        paid_to:[{ type: Schema.Types.ObjectId, ref:"UserProfile" }],
+        amount:{
+            type: String
+        },
+        settled:{
+            type: String
+        },
+        created_date:{ type: Date, default: Date.now() },
+        updated_date:{ type: Date, default: Date.now() }
+    }
+);
+
+const Expenses = mongoose.model("Expenses", ExpensesSchema);
+module.exports = Expenses;

@@ -141,7 +141,10 @@ class NewGroup extends Component {
                                                 this.state.selectedList.forEach(selection=>{
                                                     this.state.resp.forEach(user =>{
                                                         if(selection.includes(user.email)){
+                                                            if(user.rec_id)
                                                             userIDArray.push(user.rec_id);
+                                                            else if(user._id)
+                                                            userIDArray.push(user._id);
                                                         }
                                                     });
                                                 });

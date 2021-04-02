@@ -26,9 +26,13 @@ export function getUserProfile(){
 }
 
 export function getUserID(){
-    return getUserProfile().id;
+    if(getUserProfile().id){
+        return getUserProfile().id;
+    }
+    if(getUserProfile()._id){
+        return getUserProfile()._id
+    }
 }
-
 export function getUserEmail(){
     return getUserProfile().email.toLowerCase();
 }

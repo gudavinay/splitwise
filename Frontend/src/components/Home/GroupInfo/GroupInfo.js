@@ -69,7 +69,7 @@ class GroupInfo extends Component {
     const userPreferredCurrency = getUserCurrency();
     let disableExitGroup = false;
     const { id } = this.props.match.params;
-    const currentGroupInfo = getGroupsInfo().find(group => group.group_id === Number(id));
+    const currentGroupInfo = getGroupsInfo().find(group => group.group_id == id);
     var userProfileJSON = getUserProfile();
     console.log("props in groupinfo", this.props, this.state);
     let tableData = "No data found. Please try adding an expense.";

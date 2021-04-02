@@ -38,7 +38,7 @@ class Login extends Component {
             redirectVar = <Redirect to="/home/s/dashboard" />
         }
         if (this.state.loginClicked) {
-            if (this.props.user && this.props.user.id) {
+            if (this.props.user && (this.props.user.id || this.props.user.name)) {
                 localStorage.setItem("userProfile", JSON.stringify(this.props.user));
                 redirectVar = <Redirect to="/home/s/dashboard" />
             } else {

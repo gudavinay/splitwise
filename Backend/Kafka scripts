@@ -1,0 +1,6 @@
+Kafka scripts
+
+zookeeper-server-start /usr/local/etc/kafka/zookeeper.properties
+kafka-server-start /usr/local/etc/kafka/server.properties   
+kafka-console-producer --broker-list localhost:9092 --topic test
+kafka-console-consumer --bootstrap-server localhost:9092 --topic test --from-beginning

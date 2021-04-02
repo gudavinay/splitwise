@@ -43,7 +43,7 @@ class SignUp extends Component {
         }
         if (this.state.signupClicked) {
             console.log("PROPS in SINGUP after click ", this.state, this.props);
-            if (this.props.user && this.props.user.id) {
+            if (this.props.user && (this.props.user.id || this.props.user.name)) {
                 localStorage.setItem("userProfile", JSON.stringify(this.props.user));
                 redirectVar = <Redirect to="/home/s/dashboard" />
             } else if(this.props.user === 'ER_DUP_ENTRY'){
