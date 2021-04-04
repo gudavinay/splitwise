@@ -4,20 +4,25 @@ const { Schema } = mongoose;
 // _someId: Schema.Types.ObjectId,
 const ExpensesSchema = new mongoose.Schema(
     {
-        group_id:[{ type: Schema.Types.ObjectId, ref:"GroupInfo" }],
-        description:{
+        group_id: { type: Schema.Types.ObjectId, ref: "Group" },
+        description: {
             type: String
         },
-        paid_by:[{ type: Schema.Types.ObjectId, ref:"UserProfile" }],
-        paid_to:[{ type: Schema.Types.ObjectId, ref:"UserProfile" }],
-        amount:{
+        paid_by: { type: Schema.Types.ObjectId, ref: "UserProfile" },
+        paid_to_users: [{
+            paid_to: { type: Schema.Types.ObjectId, ref: "UserProfile" },
+            amount: {
+                type: String
+            },
+            settled: {
+                type: String
+            }
+        }],
+        amount: {
             type: String
         },
-        settled:{
-            type: String
-        },
-        created_date:{ type: Date, default: Date.now() },
-        updated_date:{ type: Date, default: Date.now() }
+        created_date: { type: Date, default: Date.now() },
+        updated_date: { type: Date, default: Date.now() }
     }
 );
 

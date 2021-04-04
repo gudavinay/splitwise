@@ -85,7 +85,7 @@ class GroupInfo extends Component {
                   <Row style={{ fontSize: '20px' }}>{getDateFromUtils(expense.created_date)}</Row>
                 </Col>
                 <Col sm={7} style={{ margin: 'auto' }}>{expense.description}</Col>
-                <Col sm={4} style={{ color: '#999' }}><strong>{expense.paid_by === userProfileJSON.id ? `You ` : expense.paid_by_name}</strong> paid<br /><span style={{ color: 'black' }}><strong>{currencyConverter(userProfileJSON.currency)} {expense.amount}</strong></span></Col>
+                <Col sm={4} style={{ color: '#999' }}><strong>{expense.paid_by === getUserID() ? `You ` : expense.paid_by_name}</strong> paid<br /><span style={{ color: 'black' }}><strong>{currencyConverter(userProfileJSON.currency)} {expense.amount}</strong></span></Col>
               </Row>
             </td>
           </tr>

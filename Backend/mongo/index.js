@@ -225,7 +225,7 @@ app.post('/addExpense', async function (req, res) {
   if (req.body.group_id && req.body.description && req.body.amount && req.body.paid_by) {
     // TODO check error
     let users = [];
-    Group.find({ _id: req.body.group_id }, function (err, result) {
+    Group.find({ _id: req.body.group_id }, async function (err, result) {
       console.log(result);
       result[0]['user'].forEach(user => {
         if (user.isAccepted == 1) {
@@ -235,18 +235,24 @@ app.post('/addExpense', async function (req, res) {
       console.log(users,users.length);
       var splitAmount = (req.body.amount / users.length).toFixed(2);
       var unevenSplit = (req.body.amount - (users.length - 1) * splitAmount).toFixed(2);
-      users.forEach(async (user, index) => {
-        let data = {
-          group_id:req.body.group_id, description:req.body.description, paid_by:req.body.paid_by, paid_to:user, amount:index == result.length - 1 ? unevenSplit : splitAmount, settled:'N'
-        }
-        const expenses = new Expenses(data);
-        await expenses.save(function (err, result) {
-          console.log("added",result);
-        });
-        // var tempSql = `INSERT into expenses_table (group_id, description, paid_by, paid_to, amount, settled) VALUES(${req.body.group_id},'${req.body.description}',${req.body.paid_by},${user.user_id},'${index == result.length - 1 ? unevenSplit : splitAmount}','N')`;
-        // connection.query(tempSql, function (err, res) {
-          // console.log("Inner query executed successfully", tempSql, res, err);
-        // });
+      let paid_to_users = [];
+      users.forEach((user, index) => {
+        paid_to_users.push({
+          paid_to: user,
+          amount: index == result.length - 1 ? unevenSplit : splitAmount,
+          settled: 'N'
+        })
+      });
+      let data = {
+        group_id:req.body.group_id,
+        description:req.body.description,
+        paid_by:req.body.paid_by,
+        paid_to_users: paid_to_users,
+        amount:req.body.amount
+      }
+      const expenses = new Expenses(data);
+      await expenses.save(function (err, result) {
+        console.log("added",result);
       });
       res.writeHead(200, {
         'Content-Type': 'text/plain'
@@ -257,74 +263,166 @@ app.post('/addExpense', async function (req, res) {
 });
 
 
-// app.post('/getAllExpenses', async function (req, res) {
-//   var sql = `SELECT e.group_id,e.description,e.paid_by,e.paid_to,SUM(e.amount) as amount,e.settled,u.name AS paid_to_name,uu.name AS paid_by_name,e.created_date FROM expenses_table AS e INNER JOIN  user_profile_table AS u ON u.rec_id = e.paid_to INNER JOIN user_profile_table AS uu ON uu.rec_id = e.paid_by WHERE group_id='${req.body.group_id}' and e.settled='N' GROUP BY e.description ORDER BY e.rec_id desc`;
-//   await connection.query(sql, function (error, result) {
-//       if (error) {
-//           res.writeHead(200, {
-//               'Content-Type': 'text/plain'
-//           });
-//           res.end(error.code);
-//       } else {
-//           res.writeHead(200, {
-//               'Content-Type': 'text/plain'
-//           });
-//           res.end(JSON.stringify(result));
-//       }
-//   });
-// });
+app.post('/getAllExpenses', async function (req, res) {
+  Expenses.find({ group_id: req.body.group_id })
+    .populate('group_id', ["name"])
+    .populate('paid_by', ["name"])
+    .lean()
+    .then((result) => {
+      res.writeHead(200, {
+        'Content-Type': 'text/plain'
+      });
+      console.log("res", result);
+      let data = [];
+      result.forEach(exp => {
+          let obj = {
+            created_date:exp.created_date,
+            updated_date:exp.updated_date,
+            group_id:exp.group_id._id,
+            description:exp.description,
+            paid_by:exp.paid_by._id,
+            name:exp.paid_by.name,
+            paid_by_name:exp.paid_by.name,
+            amount: exp.amount
+          }
+          data.push(obj);
+      });
+      // console.log("final", data);
+      res.end(JSON.stringify(data));
+    });
+});
 
-// app.post('/getAllIndividualExpenses', async function (req, res) {
-//   var sql = `SELECT e.group_id,e.paid_to,u.name,e.settled,e.amount,e.created_date FROM expenses_table AS e INNER JOIN user_profile_table AS u ON e.paid_to=u.rec_id WHERE group_id='${req.body.group_id}' and e.settled='N'`;
-//   await connection.query(sql, function (error, result) {
-//       if (error) {
-//           res.writeHead(200, {
-//               'Content-Type': 'text/plain'
-//           });
-//           res.end(error.code);
-//       } else {
-//           res.writeHead(200, {
-//               'Content-Type': 'text/plain'
-//           });
-//           res.end(JSON.stringify(result));
-//       }
-//   });
-// });
+app.post('/getAllIndividualExpenses', async function (req, res) {
+  Expenses.find({ group_id: req.body.group_id })
+    .populate('group_id', ["name"])
+    .populate('paid_by', ["name"])
+    .populate('paid_to_users.paid_to', ["name"])
+    .lean()
+    .then((result) => {
+      res.writeHead(200, {
+        'Content-Type': 'text/plain'
+      });
+      // console.log("res", result);
+      let data = [];
+      result.forEach(exp => {
+        exp.paid_to_users.forEach(paid_to_user => {
+          // console.log(paid_to_user);
+          if (paid_to_user.settled == 'N') {
+            let obj = {
+              created_date: exp.created_date,
+              updated_date: exp.updated_date,
+              group_id: exp.group_id._id,
+              description: exp.description,
+              paid_by: exp.paid_by._id,
+              paid_by_name: exp.paid_by.name,
+            }
+            obj.paid_to = paid_to_user.paid_to._id;
+            obj.paid_to_name = paid_to_user.paid_to.name;
+            obj.name = paid_to_user.paid_to.name;
+            obj.amount = paid_to_user.amount;
+            obj.settled = paid_to_user.settled;
+            data.push(obj);
+          }
+        });
+      });
+      // console.log("final", data);
+      res.end(JSON.stringify(data));
+    });
+});
 
-// app.post('/getAllUserExpenses', async function (req, res) {
-//   var sql = `SELECT e.group_id,e.description,e.paid_by,e.paid_to,u.name,e.settled,e.amount,e.created_date FROM expenses_table AS e INNER JOIN user_profile_table AS u ON e.paid_to=u.rec_id WHERE group_id in (SELECT group_id from user_group_table where user_id = '${req.body.user_id}')  and e.settled='N' order by e.created_date desc`;
-//   await connection.query(sql, function (error, result) {
-//       if (error) {
-//           res.writeHead(400, {
-//               'Content-Type': 'text/plain'
-//           });
-//           res.end(error.code);
-//       } else {
-//           res.writeHead(200, {
-//               'Content-Type': 'text/plain'
-//           });
-//           res.end(JSON.stringify(result));
-//       }
-//   });
-// });
+app.post('/getAllUserExpenses', async function (req, res) {
+  // Group.find(function(err,result){
+  //   result.forEach(resul=>{
+  //     console.log(resul.user);
+  //   })
+  // });
+  Expenses.find({
+    "paid_to_users.paid_to":req.body.user_id
+  })
+  .populate("paid_to_users.paid_to",["name"])
+  .lean()
+  .then((result) => {
+    res.writeHead(200, {
+      'Content-Type': 'text/plain'
+    });
+    // console.log("res", result);
+    let data = [];
+    result.forEach(exp => {
+      exp.paid_to_users.forEach(paid_to_user => {
+        // console.log(paid_to_user);
+        if(paid_to_user.settled =='N'){
+          let obj = {
+          created_date:exp.created_date,
+          updated_date:exp.updated_date,
+          group_id:exp.group_id._id,
+          description:exp.description,
+          paid_by:exp.paid_by._id,
+          paid_by_name:exp.paid_by.name,
+        }
+        obj.paid_to=paid_to_user.paid_to._id;
+        obj.paid_to_name=paid_to_user.paid_to.name;
+        obj.name=paid_to_user.paid_to.name;
+        obj.amount = paid_to_user.amount;
+        obj.settled = paid_to_user.settled;
+        data.push(obj);
+        }
+      });
+    });
+    // console.log("final", data);
+    res.end(JSON.stringify(data));
+  });
+  
+  // SELECT e.group_id,e.description,e.paid_by,e.paid_to,u.name,e.settled,e.amount,e.created_date FROM expenses_table AS e 
+  // INNER JOIN user_profile_table AS u ON e.paid_to=u.rec_id 
+  // WHERE group_id in (SELECT group_id from user_group_table where user_id = '${req.body.user_id}')  and e.settled='N' order by e.created_date desc`;
+});
 
 
-// app.post('/settleUp', async function (req, res) {
-//   var sql = `UPDATE expenses_table SET settled='Y', updated_date=NOW() WHERE (paid_by=${req.body.paid_by} and paid_to=${req.body.paid_to}) or (paid_by=${req.body.paid_to} and paid_to=${req.body.paid_by})`;
-//   await connection.query(sql, function (error, result) {
-//       if (error) {
-//           res.writeHead(200, {
-//               'Content-Type': 'text/plain'
-//           });
-//           res.end(error.code);
-//       } else {
-//           res.writeHead(200, {
-//               'Content-Type': 'text/plain'
-//           });
-//           res.end(JSON.stringify(result));
-//       }
-//   });
-// });
+app.post('/settleUp', async function (req, res) {
+  console.log(req.body)
+  Expenses.find({"paid_to_users.paid_to":req.body.paid_to,"paid_by":req.body.paid_by})
+  // .populate("paid_to_users.paid_to",["name"])
+  .lean()
+  .then((result) => {
+    res.writeHead(200, {
+      'Content-Type': 'text/plain'
+    });
+    result.forEach(exp => {
+      exp.paid_to_users.forEach(paid_to_user => {
+        if(req.body.paid_to==paid_to_user.paid_to && req.body.paid_by==exp.paid_by){
+          paid_to_user.settled = 'Y';
+          console.log("found",paid_to_user);
+        }
+      });
+      const updatedArray = exp.paid_to_users;
+      const updateDocument = {
+        $set: { "paid_to_users": updatedArray,"updated_date": new Date() }
+      };
+      console.log(updatedArray,"updatedocccccc");
+
+      Expenses.updateOne({_id:exp._id},updateDocument,function(err,result){
+        console.log("done",result);
+      })
+    });
+    // console.log("final after change", result);
+    // result.forEach(resu=>{
+    //   console.log(resu.paid_to_users);
+    // })
+    // const updatedArray = result.paid_to_users;
+    // Expenses.updateMany(result);
+    // Expenses.updateMany(result);
+
+    // const query = {"paid_to_users.paid_to":req.body.paid_to,"paid_by":req.body.paid_by};
+    // const updateDocument = {
+    //   $set: { "paid_to_users.$.size": "extra large" }
+    // };
+    // const result = await pizza.updateOne(query, updateDocument);
+
+
+    res.end(JSON.stringify(result));
+  });
+  // var sql = `UPDATE expenses_table SET settled='Y', updated_date=NOW() WHERE (paid_by=${req.body.paid_by} and paid_to=${req.body.paid_to}) or (paid_by=${req.body.paid_to} and paid_to=${req.body.paid_by})`;
+});
 
 // app.post('/updateUserProfile', async function (req, res) {
 //   var sql = `UPDATE user_profile_table SET email='${req.body.email.toUpperCase()}', name='${req.body.name}', phone='${req.body.phone}', currency='${req.body.currency}', timezone='${req.body.timezone}', language='${req.body.language}',profile_picture_url='${req.body.profilePicture}' WHERE  rec_id=${req.body.id}`;
