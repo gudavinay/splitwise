@@ -1,7 +1,5 @@
 import { Button, Table } from 'react-bootstrap';
 import React, { Component } from 'react';
-import Axios from 'axios';
-import backendServer from '../../../webConfig';
 import '../../splitwise.css'
 import { Link } from 'react-router-dom';
 import { getUserID, getUserEmail, getUserName, getGroupsInfo } from '../../Services/ControllerUtils'
@@ -9,6 +7,8 @@ import groupRedirectorSVG from '../../assets/groupRedirector.svg'
 import acceptedInviteSVG from '../../assets/acceptedInvite.svg'
 import rejectedInviteSVG from '../../assets/rejectedInvite.svg'
 import searchSVG from '../../assets/search.svg'
+import { connect } from 'react-redux';
+import { fetchGroupsRedux, acceptInviteRedux } from '../../../reduxOps/reduxActions/allGroupsRedux'
 
 class AllGroups extends Component {
     constructor(props) {
@@ -23,7 +23,7 @@ class AllGroups extends Component {
         };
     }
 
-    acceptRejectInvite = (e) => {
+    acceptRejectInvite = async (e) => {
         console.log(e.target.id);
         const data = {
             group_id: e.target.id,
@@ -31,25 +31,20 @@ class AllGroups extends Component {
             isAccepted: e.target.name === 'A' ? 1 : -1
         }
         console.log("passing in acceptRejectInvite to backend", data);
-        Axios.post(`${backendServer}/acceptInvite`, data)
-            .then(response => {
-                console.log("response recieved from newgroup req", response);
-                window.location.reload();
-            })
-            .catch(error => {
-                console.log("error recieved from newgroup req", error);
-            });
+        await this.props.acceptInviteRedux(data);
     }
 
-    componentDidMount() {
-        Axios.post(`${backendServer}/fetchGroups`, { user_id: getUserID() })
-            .then(response => {
-                this.setState({ groupsInfo: response.data })
-                localStorage.setItem("groupsInfo", JSON.stringify(response.data))
-            })
-            .catch(error => {
-                // console.log("error recieved from newgroup req", error);
-            });
+    async componentDidMount() {
+        await this.props.fetchGroupsRedux({ user_id: getUserID() });
+    }
+
+    componentDidUpdate(prevState){
+        if(prevState.groupsInfo !== this.props.groupsInfo){
+            this.setState({groupsInfo: this.props.groupsInfo})
+        }
+        if(this.props.acceptInvite){
+            window.location.reload();
+        }
     }
 
     render() {
@@ -101,4 +96,12 @@ class AllGroups extends Component {
     }
 }
 
-export default AllGroups;
+const mapStateToProps = state =>{
+    console.log("state mapstatetoprops in allGroups",state);
+    return({
+        groupsInfo: state.allGroups.groupsInfo,
+        acceptInvite: state.allGroups.acceptInvite
+    });
+}
+
+export default connect(mapStateToProps, {fetchGroupsRedux,acceptInviteRedux})(AllGroups);

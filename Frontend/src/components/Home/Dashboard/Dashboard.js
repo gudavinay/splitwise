@@ -3,9 +3,9 @@ import React, { Component } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import '../../splitwise.css'
 import { Link } from 'react-router-dom';
-import Axios from 'axios';
-import backendServer from '../../../webConfig';
 import { getUserCurrency, getUserID } from '../../Services/ControllerUtils';
+import { connect } from 'react-redux';
+import { getAllUserExpensesRedux, settleUpRedux } from '../../../reduxOps/reduxActions/dashboardRedux';
 
 class Dashboard extends Component {
     constructor(props) {
@@ -15,24 +15,18 @@ class Dashboard extends Component {
         };
     }
 
-    componentDidMount() {
-        Axios.get(`${backendServer}/fetchUsers`)
-            .then(response => {
-                console.log(response);
-                this.setState({ resp: response.data });
-            })
-            .catch(error => {
-                console.log(error);
-            });
+    async componentDidMount() {
+        await this.props.getAllUserExpensesRedux({ user_id: getUserID() });
+    }
 
-        Axios.post(`${backendServer}/getAllUserExpenses`, { user_id: getUserID() })
-            .then(response => {
-                console.log("response recieved from getallUserExpenses req", response);
-                this.setState({ allUserExpenses: response.data })
-            })
-            .catch(error => {
-                console.log("error recieved from getallUserExpenses req", error);
-            });
+    componentDidUpdate(prevState){
+        if(prevState.allUserExpenses !== this.props.allUserExpenses)
+        {
+            this.setState({allUserExpenses: this.props.allUserExpenses})
+        }
+        if(this.props.settleUp){
+            window.location.reload();
+        }
     }
 
     onSubmit = async (event) => {
@@ -41,14 +35,7 @@ class Dashboard extends Component {
             paid_by: "" + getUserID(),
             paid_to: "" + this.state.settleUpUser
         };
-        await Axios.post(`${backendServer}/settleUp`, data)
-            .then(response => {
-                console.log("response recieved from settleUp req", response);
-                window.location.reload();
-            })
-            .catch(error => {
-                console.log("error recieved from settleUp req", error);
-            });
+        await this.props.settleUpRedux(data);
     }
 
 
@@ -198,4 +185,13 @@ class Dashboard extends Component {
     }
 }
 
-export default Dashboard;
+// export default Dashboard;
+const mapStateToProps = state =>{
+    console.log("state mapstatetoprops in dashboard",state);
+    return({
+        allUserExpenses: state.dashboard.allUserExpenses,
+        settleUp: state.dashboard.settleUp
+    });
+}
+
+export default connect(mapStateToProps, {getAllUserExpensesRedux,settleUpRedux})(Dashboard);
