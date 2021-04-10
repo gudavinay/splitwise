@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import { Button, Col, Collapse, Modal, OverlayTrigger, Row, Table, Tooltip } from "react-bootstrap";
-import Axios from 'axios';
-import backendServer from '../../../webConfig'
 import { currencyConverter, getUserID, getUserProfile, getUserCurrency, getGroupsInfo, getMonthFromUtils, getDateFromUtils } from '../../Services/ControllerUtils'
 import "../../splitwise.css";
 import notesSVG from '../../assets/notes.svg';
 import { Link } from "react-router-dom";
 import settingsSVG from '../../assets/settings.svg'
+import { connect } from 'react-redux';
+import { getAllExpensesRedux, getAllIndividualExpensesRedux, addExpenseRedux, exitGroupRedux } from '../../../reduxOps/reduxActions/groupsInfoRedux';
 
 class GroupInfo extends Component {
   constructor(props) {
@@ -30,39 +30,27 @@ class GroupInfo extends Component {
       group_id: this.props.match.params.id,
       paid_by: "" + getUserID()
     };
-    await Axios.post(`${backendServer}/addExpense`, data)
-      .then(response => {
-        console.log("response recieved from addExpense req", response);
-        this.setState({ show: false })
-        window.location.reload();
-      })
-      .catch(error => {
-        console.log("error recieved from addExpense req", error);
-        // this.setState({error:true})
-      });
+    await this.props.addExpenseRedux(data);
+  }
+  async componentDidMount() {
+    await this.props.getAllExpensesRedux({ group_id: this.props.match.params.id });
+    await this.props.getAllIndividualExpensesRedux({ group_id: this.props.match.params.id });
   }
 
-  componentDidMount() {
-    const data = {
-      group_id: this.props.match.params.id
-    };
-    Axios.post(`${backendServer}/getAllExpenses`, data)
-      .then(response => {
-        console.log("response recieved from getAllExpenses req", response);
-        this.setState({ allExpenses: response.data })
-      })
-      .catch(error => {
-        console.log("error recieved from getAllExpenses req", error);
-      });
 
-    Axios.post(`${backendServer}/getAllIndividualExpenses`, data)
-      .then(response => {
-        console.log("response recieved from getAllIndividualExpenses req", response);
-        this.setState({ allIndividualExpenses: response.data })
-      })
-      .catch(error => {
-        console.log("error recieved from getAllIndividualExpenses req", error);
-      });
+  componentDidUpdate(prevState) {
+    if (prevState.allExpenses !== this.props.allExpenses) {
+      this.setState({ allExpenses: this.props.allExpenses })
+    }
+    if (prevState.allIndividualExpenses !== this.props.allIndividualExpenses) {
+      this.setState({ allIndividualExpenses: this.props.allIndividualExpenses })
+    }
+    if (this.props.exitGroup) {
+      this.props.history.push("/");
+    }
+    if (this.props.addExpense) {
+      window.location.reload();
+    }
   }
 
   render() {
@@ -98,7 +86,7 @@ class GroupInfo extends Component {
     let userExpense = {};
     let userExpenseNames = {};
     let groupBalances = "No data found.";
-    userExpense[getUserID()]=0;
+    userExpense[getUserID()] = 0;
     if (this.state.allIndividualExpenses && this.state.allIndividualExpenses.length > 0 && this.state.allIndividualExpenses[0] && this.state.allIndividualExpenses[0].group_id && this.state.allExpenses && this.state.allExpenses.length > 0 && this.state.allExpenses[0] && this.state.allExpenses[0].group_id) {
       this.state.allExpenses.forEach(expense => {
         userExpense[expense.paid_by] = 0;
@@ -133,7 +121,7 @@ class GroupInfo extends Component {
       })
     }
 
-    let disableLeaveGroup = Number(userExpense[getUserID()]) !== 0 ;
+    let disableLeaveGroup = Number(userExpense[getUserID()]) !== 0;
 
     return (
       <React.Fragment>
@@ -158,7 +146,7 @@ class GroupInfo extends Component {
             </Table>
           </Col>
           <Col>
-            <div style={{backgroundColor:'#eee',borderRadius:'4px',padding:'10px',width:'fit-content'}}>
+            <div style={{ backgroundColor: '#eee', borderRadius: '4px', padding: '10px', width: 'fit-content' }}>
               <a onClick={() => this.setState((state) => {
                 return { open: !state.open }
               })}>Group settings  <img style={{ padding: '0px 4px' }} src={settingsSVG} alt="" /></a>
@@ -170,29 +158,21 @@ class GroupInfo extends Component {
                   <div>
                     <OverlayTrigger placement="left" overlay={
                       <Tooltip id={`tooltip-left`}>
-                      <span>You can leave the group only when <strong>all your expenses</strong> are <strong>settled up</strong></span>
+                        <span>You can leave the group only when <strong>all your expenses</strong> are <strong>settled up</strong></span>
                       </Tooltip>}>
                       <span>
                         <Button onClick={async (e) => {
-                          await Axios.post(`${backendServer}/exitGroup`, { group_id: id, user_id: getUserID() })
-                            .then(response => {
-                              console.log("response recieved from exitGroup req", response);
-                              // alert("Group deleted successfully!")
-                              this.props.history.push("/");
-                            })
-                            .catch(error => {
-                              console.log("error recieved from exitGroup req", error);
-                            });
-                        }} variant="danger" disabled={disableLeaveGroup} style={{ fontSize: '12px', borderColor: 'indianred', padding: '0px 10px', margin: '4px 27px 10px 28px',display:'block' }}>Leave Group</Button></span>
+                          await this.props.exitGroupRedux({ group_id: id, user_id: getUserID() });
+                        }} variant="danger" disabled={disableLeaveGroup} style={{ fontSize: '12px', borderColor: 'indianred', padding: '0px 10px', margin: '4px 27px 10px 28px', display: 'block' }}>Leave Group</Button></span>
                     </OverlayTrigger>
                   </div>
                   <div>
                     <OverlayTrigger placement="left" overlay={
                       <Tooltip id={`tooltip-left`}>
-                      <span>You can delete the group only when <strong>all the expenses</strong> are <strong>settled up</strong></span>
+                        <span>You can delete the group only when <strong>all the expenses</strong> are <strong>settled up</strong></span>
                       </Tooltip>}>
                       <span>
-                        <Button variant="danger" disabled={disableExitGroup} style={{ fontSize: '12px', borderColor: 'indianred', padding: '0px 10px', margin: '5px 27px',display:'block' }}>Delete Group</Button></span>
+                        <Button variant="danger" disabled={disableExitGroup} style={{ fontSize: '12px', borderColor: 'indianred', padding: '0px 10px', margin: '5px 27px', display: 'block' }}>Delete Group</Button></span>
                     </OverlayTrigger>
                   </div>
                 </div>
@@ -250,5 +230,15 @@ class GroupInfo extends Component {
   }
 }
 
-export default GroupInfo;
+const mapStateToProps = state => {
+  console.log("state mapstatetoprops in dashboard", state);
+  return ({
+    allExpenses: state.groupsInfo.allExpenses,
+    allIndividualExpenses: state.groupsInfo.allIndividualExpenses,
+    addExpense: state.groupsInfo.addExpense,
+    exitGroup: state.groupsInfo.exitGroup
+  });
+}
+
+export default connect(mapStateToProps, { getAllExpensesRedux, getAllIndividualExpensesRedux, addExpenseRedux, exitGroupRedux })(GroupInfo);
 

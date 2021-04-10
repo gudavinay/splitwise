@@ -1,20 +1,20 @@
 import { Button, Collapse } from 'react-bootstrap';
 import React, { Component } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import Axios from 'axios';
-import backendServer from '../../../webConfig';
 import logoSmall from '../../../images/logoSmall.png';
 import '../../splitwise.css'
 import { getUserEmail, getUserID, getUserName } from '../../Services/ControllerUtils';
 import crossSVG from '../../assets/cross.svg';
 import profileImage from '../../../images/profileImage.png'
+import { connect } from 'react-redux';
+import { fetchUsersRedux, newGroupRedux } from '../../../reduxOps/reduxActions/newGroupRedux';
 
 class NewGroup extends Component {
     constructor(props) {
         super(props);
         this.state = {
             groupName: null,
-            resp: [],
+            fetchUsers: [],
             open: false,
             defaultCount: 4,
             selectedList: [(getUserName().toLowerCase() + " / " +  getUserEmail().toLowerCase())],
@@ -22,15 +22,20 @@ class NewGroup extends Component {
         };
     }
 
-    componentDidMount() {
-        Axios.get(`${backendServer}/fetchUsers`)
-            .then(response => {
-                console.log(response);
-                this.setState({ resp: response.data });
-            })
-            .catch(error => {
-                console.log(error);
-            });
+    async componentDidMount() {
+        await this.props.fetchUsersRedux();
+    }
+
+    componentDidUpdate(prevState){
+        if(prevState.fetchUsers !== this.props.fetchUsers){
+            this.setState({fetchUsers: this.props.fetchUsers})
+        }
+        if(prevState.uploadedFile !== this.props.uploadedFile){
+            this.setState({uploadedFile: this.props.uploadedFile})
+        }
+        if(this.props.newGroup){
+            this.props.history.push("/home/s/dashboard")
+        }
     }
 
 
@@ -55,16 +60,11 @@ class NewGroup extends Component {
                                             <input style={{fontSize:'12px'}} className="form-control" type="file" name="profilepicture" accept="image/*" onChange={this.uploadImage} />
                                         </Col>
                                         <Col sm={3}>
-                                        <Button onClick={()=>{
+                                        <Button onClick={async ()=>{
                                     let formData = new FormData();
                                     formData.append('myImage', this.state.file);
                                     const config={headers:{'content-type':'multipart/form-data'}};
-                                    Axios.post("/uploadUserProfilePicture",formData,config).then(response=>{
-                                        alert("file uploaded successfully");
-                                        this.setState({uploadedFile:response.data})
-                                    },error=>{
-                                        // this.setState
-                                    })
+                                    await this.props.uploadUserProfilePictureRedux("/uploadUserProfilePicture",formData,config);
                                 }} disabled={!this.state.file} style={{ margin: 'auto', backgroundColor: '#FF6139', borderColor: '#FF6139',fontSize:'12px' }} >Upload</Button><br/>
                                         </Col>
                                 
@@ -96,7 +96,7 @@ class NewGroup extends Component {
                                         <Col>
                                             <input style={{width:'51%', marginRight:'10px'}} id="newGroupPersons" onChange={(e) => this.setState({ selected: e.target.value })} type="text" list="email" placeholder="Search with Name or Email address"/>
                                             <datalist onChange={(e) => console.log("onchange", e)} id="email">
-                                                {this.state.resp.map((element, index) =>
+                                                {this.state.fetchUsers.map((element, index) =>
                                                     <option key={element.id} value={element.id}>{element.name} / {element.email}</option>
                                                 )}
                                             </datalist>
@@ -136,10 +136,10 @@ class NewGroup extends Component {
                                     <hr/>
                                     <Row>
                                         <Col>
-                                            <Button style={{ backgroundColor:'#FF6139' ,borderColor:'#FF6139'}} onClick={()=>{
+                                            <Button style={{ backgroundColor:'#FF6139' ,borderColor:'#FF6139'}} onClick={async ()=>{
                                                 let userIDArray = [];
                                                 this.state.selectedList.forEach(selection=>{
-                                                    this.state.resp.forEach(user =>{
+                                                    this.state.fetchUsers.forEach(user =>{
                                                         if(selection.includes(user.email)){
                                                             if(user.rec_id)
                                                             userIDArray.push(user.rec_id);
@@ -156,14 +156,7 @@ class NewGroup extends Component {
                                                     userIDArray:userIDArray,
                                                     profilePicture: this.state.uploadedFile,
                                                 }
-                                                Axios.post(`${backendServer}/newGroup`, data)
-                                                .then(response => {
-                                                    console.log("response recieved from newgroup req", response);
-                                                    this.props.history.push("/home/s/dashboard")
-                                                })
-                                                .catch(error => {
-                                                    console.log("error recieved from newgroup req", error);
-                                                });
+                                                await this.props.newGroupRedux(data);
                                             }} >Save</Button>
                                         </Col>
                                     </Row>
@@ -177,4 +170,13 @@ class NewGroup extends Component {
     }
 }
 
-export default NewGroup;
+const mapStateToProps = state =>{
+    console.log("state mapstatetoprops in newGroup",state);
+    return({
+        fetchUsers: state.newGroup.fetchUsers,
+        newGroup: state.newGroup.newGroup,
+        uploadedFile: state.newGroup.uploadedFile
+    });
+}
+
+export default connect(mapStateToProps, { fetchUsersRedux, newGroupRedux })(NewGroup);

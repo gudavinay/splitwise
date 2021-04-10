@@ -20,8 +20,7 @@ class Dashboard extends Component {
     }
 
     componentDidUpdate(prevState){
-        if(prevState.allUserExpenses !== this.props.allUserExpenses)
-        {
+        if(prevState.allUserExpenses !== this.props.allUserExpenses){
             this.setState({allUserExpenses: this.props.allUserExpenses})
         }
         if(this.props.settleUp){

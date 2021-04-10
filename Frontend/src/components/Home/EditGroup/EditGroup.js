@@ -6,6 +6,8 @@ import backendServer from '../../../webConfig';
 import '../../splitwise.css'
 import profileImage from '../../../images/profileImage.png'
 import { fetchGroupName, fetchGroupProfilePicture } from '../../Services/ControllerUtils'
+import { connect } from 'react-redux';
+import { getGroupMembersRedux, updateGroupRedux } from '../../../reduxOps/reduxActions/editGroupRedux';
 
 class EditGroup extends Component {
     constructor(props) {
@@ -18,20 +20,36 @@ class EditGroup extends Component {
         };
     }
 
-    componentDidMount() {
-        Axios.post(`${backendServer}/getGroupMembers`, { group_id: this.props.match.params.id })
-            .then(response => {
-                console.log(response);
-                let arr = [];
-                response.data.forEach(data => {
-                    arr.push(data.name.toLowerCase() + " / " + data.email.toLowerCase())
-                })
-                this.setState({ selectedList: arr });
-            })
-            .catch(error => {
-                console.log(error);
-            });
+    async componentDidMount() {
+        await this.props.getGroupMembersRedux({ group_id: this.props.match.params.id });
+        // Axios.post(`${backendServer}/getGroupMembers`, { group_id: this.props.match.params.id })
+        //     .then(response => {
+        //         console.log(response);
+        //         let arr = [];
+        //         response.data.forEach(data => {
+        //             arr.push(data.name.toLowerCase() + " / " + data.email.toLowerCase())
+        //         })
+        //         this.setState({ selectedList: arr });
+        //     })
+        //     .catch(error => {
+        //         console.log(error);
+        //     });
     }
+
+    componentDidUpdate(prevState){
+        if(prevState.groupMembers !== this.props.groupMembers)
+        {
+            let arr = [];
+            this.props.groupMembers.forEach(data => {
+                arr.push(data.name.toLowerCase() + " / " + data.email.toLowerCase())
+            })
+            this.setState({groupMembers: this.props.groupMembers,selectedList: arr })
+        }
+        if(this.props.updateGroup){
+            this.props.history.push("/home/s/dashboard")
+        }
+    }
+
 
     render() {
         // console.log(this.state);
@@ -78,20 +96,21 @@ class EditGroup extends Component {
                                 <hr />
                                 <Row>
                                     <Col>
-                                        <Button style={{ backgroundColor: '#FF6139', borderColor: '#FF6139' }} onClick={() => {
+                                        <Button style={{ backgroundColor: '#FF6139', borderColor: '#FF6139' }} onClick={async () => {
                                             const data = {
                                                 name: this.state.groupName,
                                                 group_id: this.props.match.params.id
                                             }
-                                            Axios.post(`${backendServer}/updateGroup`, data)
-                                                .then(response => {
-                                                    console.log("response recieved from updateGroup req", response);
-                                                    this.props.history.push("/home/s/dashboard")
-                                                })
-                                                .catch(error => {
-                                                    console.log("error recieved from updateGroup req", error);
-                                                    this.setState({error:true})
-                                                });
+                                            await this.props.updateGroupRedux(data);
+                                            // Axios.post(`${backendServer}/updateGroup`, data)
+                                            //     .then(response => {
+                                            //         console.log("response recieved from updateGroup req", response);
+                                            //         this.props.history.push("/home/s/dashboard")
+                                            //     })
+                                            //     .catch(error => {
+                                            //         console.log("error recieved from updateGroup req", error);
+                                            //         this.setState({error:true})
+                                            //     });
                                         }} >Save</Button>
                                         
                                     </Col>
@@ -105,4 +124,12 @@ class EditGroup extends Component {
     }
 }
 
-export default EditGroup;
+const mapStateToProps = state =>{
+    console.log("state mapstatetoprops in edit group",state);
+    return({
+        groupMembers: state.editGroup.groupMembers,
+        updateGroup: state.editGroup.updateGroup
+    });
+}
+
+export default connect(mapStateToProps, {getGroupMembersRedux,updateGroupRedux})(EditGroup);
