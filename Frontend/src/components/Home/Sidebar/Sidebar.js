@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import '../../splitwise.css';
-import backendServer from '../../../webConfig'
-import Axios from 'axios';
 import { Link } from 'react-router-dom';
 import { getUserID } from '../../Services/ControllerUtils';
 import groupTagSVG from '../../assets/groupTag.svg'
 import allGroupsSVG from '../../assets/allGroups.svg'
 import dashboardSVG from '../../assets/dashboard.svg'
 import recentActivitiesSVG from '../../assets/recentActivities.svg'
+import { connect } from 'react-redux';
+import { fetchGroupsRedux } from '../../../reduxOps/reduxActions/allGroupsRedux'
 class Sidebar extends Component {
     constructor(props) {
         super(props);
@@ -17,25 +17,15 @@ class Sidebar extends Component {
         };
     }
 
-    componentDidMount() {
-        const data = {
-            user_id: getUserID()
+    async componentDidMount() {
+        await this.props.fetchGroupsRedux({user_id: getUserID()});
+    }
+
+    componentDidUpdate(prevState){
+        if(prevState.groups !== this.props.groups){
+            localStorage.setItem("groupsInfo", JSON.stringify(this.props.groups))
+            this.setState({groups: this.props.groups})
         }
-        Axios.post(`${backendServer}/fetchGroups`, data)
-            .then(response => {
-                console.log("response recieved from sidebar - fetch groups req", response);
-                this.setState({ groups: response.data });
-                localStorage.setItem("groupsInfo", JSON.stringify(response.data))
-                response.data.forEach(group => {
-                    if (!this.state.pendingGroupsToAcceptFlag && group.isAccepted === 0) {
-                        this.setState({ pendingGroupsToAcceptFlag: true })
-                    }
-                });
-            })
-            .catch(error => {
-                console.log("error recieved from sidebar - fetch groups req", error);
-                this.setState({ groups: [] })
-            });
     }
 
     render() {
@@ -90,4 +80,11 @@ class Sidebar extends Component {
     }
 }
 
-export default Sidebar;
+const mapStateToProps = state =>{
+    console.log("state mapstatetoprops in sidebar",state);
+    return({
+        groups: state.allGroups.groupsInfo
+    });
+}
+
+export default connect(mapStateToProps, {fetchGroupsRedux})(Sidebar);

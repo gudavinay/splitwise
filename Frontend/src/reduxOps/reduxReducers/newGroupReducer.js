@@ -1,4 +1,4 @@
-import { NEW_GROUP, FETCH_USERS } from "../types";
+import { NEW_GROUP, FETCH_USERS, UPLOAD_USER_PROFILE_PICTURE } from "../types";
 
 const initialState = {
     fetchUsers: {},
@@ -13,6 +13,9 @@ export default function (state = initialState, action) {
         case NEW_GROUP:
             console.log("reducing NEW_GROUP type------", state);
             return { ...state, newGroup: action.payload };
+        case UPLOAD_USER_PROFILE_PICTURE:
+            console.log("reducing NEW_GROUP type------", state);
+            return { ...state, uploadedFile: action.payload };
         default:
             return state;
     }

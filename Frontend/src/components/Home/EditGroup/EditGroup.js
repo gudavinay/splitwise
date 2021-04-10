@@ -1,7 +1,6 @@
 import { Alert, Button } from 'react-bootstrap';
 import React, { Component } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import Axios from 'axios';
 import backendServer from '../../../webConfig';
 import '../../splitwise.css'
 import profileImage from '../../../images/profileImage.png'

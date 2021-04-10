@@ -1,4 +1,4 @@
-import { SETTLE_UP, ERROR, GET_ALL_USER_EXPENSES } from "../types";
+import { SETTLE_UP, GET_ALL_USER_EXPENSES } from "../types";
 
 const initialState = {
     allUserExpenses: {},

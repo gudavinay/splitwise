@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Col, Row, Table } from 'react-bootstrap';
-import Axios from 'axios';
-import backendServer from '../../../webConfig'
 import { getMonthFromUtils, getUserID, getDateFromUtils, getUserCurrency } from '../../Services/ControllerUtils';
 import notesSVG from '../../assets/notes.svg'
 import settledUp from '../../../images/settledup.png'
+import { connect } from 'react-redux';
+import { getAllUserExpensesForRecentActivitiesRedux } from '../../../reduxOps/reduxActions/recentActivitiesRedux'
 
 class RecentActivities extends Component {
     constructor(props) {
@@ -14,15 +14,14 @@ class RecentActivities extends Component {
         };
     }
 
-    componentDidMount() {
-        Axios.post(`${backendServer}/getAllUserExpensesForRecentActivities`, { user_id: getUserID() })
-            .then(response => {
-                console.log("response recieved from getAllUserExpensesForRecentActivities req", response);
-                this.setState({ allUserExpenses: response.data })
-            })
-            .catch(error => {
-                console.log("error recieved from getAllUserExpensesForRecentActivities req", error);
-            });
+    async componentDidMount() {
+        await this.props.getAllUserExpensesForRecentActivitiesRedux({ user_id: getUserID() });
+    }
+
+    componentDidUpdate(prevState){
+        if(prevState.allUserExpensesForRA !== this.props.allUserExpensesForRA){
+            this.setState({allUserExpensesForRA: this.props.allUserExpensesForRA})
+        }
     }
 
     toggleByDate() {
@@ -34,7 +33,7 @@ class RecentActivities extends Component {
         // console.log("state in RA -----",this.state);
         let tableData = "No data found.";
         const userPreferredCurrency = getUserCurrency();
-        let dataToBeProcessed = this.state.groupSelected ? this.state.allUserExpenses.filter(exp => exp.group_id === Number(this.state.selectedGroup)) : this.state.allUserExpenses;
+        let dataToBeProcessed = this.state.groupSelected ? this.state.allUserExpensesForRA.filter(exp => exp.group_id === Number(this.state.selectedGroup)) : this.state.allUserExpensesForRA;
         if (dataToBeProcessed && dataToBeProcessed.length > 0 && dataToBeProcessed[0] && dataToBeProcessed[0].group_id) {
             tableData = [];
             dataToBeProcessed.forEach(expense => {
@@ -66,8 +65,8 @@ class RecentActivities extends Component {
 
         let groupOptions = {};
         let groupOptionsToDisplay = [<option key="ALL_GROUP" id="ALL_GROUP">All Groups</option>];
-        if (this.state.allUserExpenses && this.state.allUserExpenses.length > 0 && this.state.allUserExpenses[0] && this.state.allUserExpenses[0].group_id) {
-            this.state.allUserExpenses.forEach(expense => {
+        if (this.state.allUserExpensesForRA && this.state.allUserExpensesForRA.length > 0 && this.state.allUserExpensesForRA[0] && this.state.allUserExpensesForRA[0].group_id) {
+            this.state.allUserExpensesForRA.forEach(expense => {
                 groupOptions[expense.group_id] = expense.group_name;
             });
         }
@@ -103,7 +102,7 @@ class RecentActivities extends Component {
                                             <div>
                                                 <select style={{ width: '100%', fontSize: '13px' }} onChange={(e) => {
                                                     this.setState((state) => {
-                                                        return { allUserExpenses: state.allUserExpenses.reverse() }
+                                                        return { allUserExpensesForRA: state.allUserExpensesForRA.reverse() }
                                                     })
                                                 }} className="form-control" name="createdDate" id="createdDate">
                                                     <option>Most recent on top</option>
@@ -119,10 +118,17 @@ class RecentActivities extends Component {
                         {tableData}
                     </tbody>
                 </Table>
-                {/* {JSON.stringify(this.state.allUserExpenses)} */}
+                {/* {JSON.stringify(this.state.allUserExpensesForRA)} */}
             </React.Fragment>
         );
     }
 }
 
-export default RecentActivities;
+const mapStateToProps = state =>{
+    console.log("state mapstatetoprops in recentactivities",state);
+    return({
+        allUserExpensesForRA: state.recentActivities.allUserExpensesForRA
+    });
+}
+
+export default connect(mapStateToProps, {getAllUserExpensesForRecentActivitiesRedux})(RecentActivities);

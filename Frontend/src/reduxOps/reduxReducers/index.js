@@ -1,10 +1,12 @@
 import { combineReducers } from 'redux';
+import { updateUserProfileRedux } from '../reduxActions/userProfileRedux';
 import allGroupsReducer from './allGroupsReducer';
 import dashboardReducer from './dashboardReducer';
 import editGroupReducer from './editGroupReducer';
 import groupsInfoReducer from './groupsInfoReducer';
 import loginReducer from './loginReducer';
 import newGroupReducer from './newGroupReducer';
+import recentActivitiesReducer from './recentActivitiesReducer';
 import signupReducer from './signupReducer';
 
 export default combineReducers({
@@ -14,7 +16,9 @@ export default combineReducers({
     allGroups: allGroupsReducer,
     editGroup: editGroupReducer,
     groupsInfo: groupsInfoReducer,
-    newGroup: newGroupReducer
+    newGroup: newGroupReducer,
+    updateUserProfile: updateUserProfileRedux,
+    recentActivities: recentActivitiesReducer
 });
 
 // const rootReducer = (state, action) => {

@@ -4,8 +4,10 @@ import { Col, Container, Row } from 'react-bootstrap';
 import { getUserEmail, getUserName, getUserPhone, getUserCurrencyDesc, getUserTimezone, getUserLanguage, getUserID, getProfilePicture } from '../../Services/ControllerUtils';
 // import store from '../../../store'
 import backendServer from '../../../webConfig'
-import Axios from 'axios';
 import { Alert } from 'react-bootstrap';
+import { connect } from 'react-redux';
+import { updateUserProfileRedux } from '../../../reduxOps/reduxActions/userProfileRedux';
+import { uploadUserProfilePictureRedux } from '../../../reduxOps/reduxActions/newGroupRedux';
 
 class UserProfile extends Component {
     constructor(props) {
@@ -17,9 +19,9 @@ class UserProfile extends Component {
             currency: getUserCurrencyDesc(),
             language: getUserLanguage(),
             timezone: getUserTimezone(),
-            profilePicture:getProfilePicture(),
-            saveSuccess:false,
-            saveFailed:false,
+            profilePicture: getProfilePicture(),
+            saveSuccess: false,
+            saveFailed: false,
         }
     }
 
@@ -44,17 +46,28 @@ class UserProfile extends Component {
             id: getUserID()
         };
         console.log(this.state);
-        await Axios.post(`${backendServer}/updateUserProfile`, data)
-            .then(response => {
-                console.log("response recieved from updateUserProfile - fetch groups req", response);
-                localStorage.setItem("userProfile", JSON.stringify(data));
-                this.setState({saveSuccess:true,saveFailed:false})
-            })
-            .catch(error => {
-                console.log("error recieved from updateUserProfile - fetch groups req", error);
-                this.setState({saveFailed:true,saveSuccess:false})
-            });
+        await this.props.updateUserProfileRedux(data);
+        // await Axios.post(`${backendServer}/updateUserProfile`, data)
+        //     .then(response => {
+        //         console.log("response recieved from updateUserProfile - fetch groups req", response);
+        //         localStorage.setItem("userProfile", JSON.stringify(data));
+        //         this.setState({saveSuccess:true,saveFailed:false})
+        //     })
+        //     .catch(error => {
+        //         console.log("error recieved from updateUserProfile - fetch groups req", error);
+        //         this.setState({saveFailed:true,saveSuccess:false})
+        //     });
 
+    }
+
+    componentDidUpdate(prevState) {
+        if (prevState.userProfile !== this.props.userProfile) {
+            localStorage.setItem("userProfile", JSON.stringify(this.props.allUserExpenses));
+            this.setState({ saveSuccess: true, saveFailed: false })
+        }
+        if(prevState.uploadedFile !== this.props.uploadedFile){
+            this.setState({uploadedFile: this.props.uploadedFile})
+        }
     }
 
     render() {
@@ -67,27 +80,28 @@ class UserProfile extends Component {
                                 <center>
                                     <h2>Your account</h2>
                                     {/* <img src="https://png.pngtree.com/png-vector/20191023/ourlarge/pngtree-user-vector-icon-with-white-background-png-image_1849343.jpg" style={{ height: '100%', width: '100%' }} alt="profilephoto" /> */}
-                                    <img src={backendServer+"/user/"+getProfilePicture()} style={{ height: '100%', width: '100%' }} alt="profilephoto" />
-                                    <Row style={{marginTop:'10px'}}>
+                                    <img src={backendServer + "/user/" + getProfilePicture()} style={{ height: '100%', width: '100%' }} alt="profilephoto" />
+                                    <Row style={{ marginTop: '10px' }}>
                                         <Col sm={9}>
-                                            <input style={{fontSize:'12px'}} className="form-control" type="file" name="profilepicture" accept="image/*" onChange={this.uploadImage} />
+                                            <input style={{ fontSize: '12px' }} className="form-control" type="file" name="profilepicture" accept="image/*" onChange={this.uploadImage} />
                                         </Col>
                                         <Col sm={3}>
-                                        <Button onClick={()=>{
-                                    let formData = new FormData();
-                                    formData.append('myImage', this.state.file);
-                                    const config={headers:{'content-type':'multipart/form-data'}};
-                                    Axios.post("/uploadUserProfilePicture",formData,config).then(response=>{
-                                        alert("file uploaded successfully");
-                                        this.setState({uploadedFile:response.data})
-                                    },error=>{
-                                        // this.setState
-                                    })
-                                }} disabled={!this.state.file} style={{ margin: 'auto', backgroundColor: '#FF6139', borderColor: '#FF6139',fontSize:'12px' }} >Upload</Button><br/>
+                                            <Button onClick={async () => {
+                                                let formData = new FormData();
+                                                formData.append('myImage', this.state.file);
+                                                const config = { headers: { 'content-type': 'multipart/form-data' } };
+                                                await this.props.uploadUserProfilePictureRedux("/uploadUserProfilePicture", formData, config);
+                                                // Axios.post("/uploadUserProfilePicture", formData, config).then(response => {
+                                                //     alert("file uploaded successfully");
+                                                //     this.setState({ uploadedFile: response.data })
+                                                // }, error => {
+                                                //     // this.setState
+                                                // })
+                                            }} disabled={!this.state.file} style={{ margin: 'auto', backgroundColor: '#FF6139', borderColor: '#FF6139', fontSize: '12px' }} >Upload</Button><br />
                                         </Col>
-                                
+
                                     </Row>
-                                    
+
                                 </center>
                             </Col>
                             <Col style={{ margin: '5rem' }}>
@@ -298,10 +312,10 @@ class UserProfile extends Component {
                                 </Row>
                             </Col>
 
-                            <div style={{textAlign:'center'}}>
-                                <Button type="submit" style={{ margin: 'auto', backgroundColor: '#5bc5a7', borderColor: '#5bc5a7' }} >Save</Button><br/>
-                                {this.state.saveSuccess && <Alert style={{width:'15rem',margin:'auto',marginTop:'1rem'}} variant='success'>User Profile Updated.</Alert>}
-                                {this.state.saveFailed && <Alert style={{width:'15rem',margin:'auto',marginTop:'1rem'}} variant='danger'>Error Occured.</Alert>}
+                            <div style={{ textAlign: 'center' }}>
+                                <Button type="submit" style={{ margin: 'auto', backgroundColor: '#5bc5a7', borderColor: '#5bc5a7' }} >Save</Button><br />
+                                {this.state.saveSuccess && <Alert style={{ width: '15rem', margin: 'auto', marginTop: '1rem' }} variant='success'>User Profile Updated.</Alert>}
+                                {this.state.saveFailed && <Alert style={{ width: '15rem', margin: 'auto', marginTop: '1rem' }} variant='danger'>Error Occured.</Alert>}
                             </div>
                         </Row>
                     </form>
@@ -311,4 +325,12 @@ class UserProfile extends Component {
     };
 }
 
-export default UserProfile;
+const mapStateToProps = state => {
+    console.log("state mapstatetoprops in UserProfile", state);
+    return ({
+        userProfile: state.updateUserProfile.userProfile,
+        uploadedFile : state.newGroup.uploadedFile
+    });
+}
+
+export default connect(mapStateToProps, { updateUserProfileRedux,uploadUserProfilePictureRedux })(UserProfile);
