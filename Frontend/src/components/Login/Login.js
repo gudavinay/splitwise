@@ -8,6 +8,7 @@ import { loginRedux } from '../../reduxOps/reduxActions/loginRedux';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { getUserProfile } from '../Services/ControllerUtils';
+const jwt_decode = require('jwt-decode');
 
 //Define a Login Component
 class Login extends Component {
@@ -38,6 +39,8 @@ class Login extends Component {
             redirectVar = <Redirect to="/home/s/dashboard" />
         }
         if (this.state.loginClicked) {
+            var decoded = jwt_decode(this.props.user.token);
+            console.log("decoded msg - login - ", decoded, this.props.user.token);
             if (this.props.user && (this.props.user.id || this.props.user.name)) {
                 localStorage.setItem("userProfile", JSON.stringify(this.props.user));
                 redirectVar = <Redirect to="/home/s/dashboard" />

@@ -12,8 +12,13 @@ var ObjectID = require('mongodb').ObjectID;
 const passwordHash = require('password-hash');
 const path = require('path');
 
+const jwt = require('jsonwebtoken')
+const config = require('./config');
+const { auth, checkAuth } = require('./passport');
+auth();
+
 //use cors to allow cross origin resource sharing
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(cors({ origin: config.frontEnd, credentials: true }));
 
 //use express session to maintain session data
 app.use(session({
@@ -30,7 +35,7 @@ app.use(session({
 app.use(bodyParser.json());
 //Allow Access Control
 app.use(function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.setHeader('Access-Control-Allow-Origin', config.frontEnd);
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT,DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
@@ -38,7 +43,6 @@ app.use(function (req, res, next) {
   next();
 });
 
-const config = require('./config');
 const db = config.mongoURI;
 const mongoose = require('mongoose');
 
@@ -92,18 +96,33 @@ app.post('/signup', async function (req, res) {
 
 
 app.post('/login', async function (req, res) {
-  console.log(req.body);
   await UserProfile.findOne({ email: req.body.email.toUpperCase() }, function (err, result) {
-    console.log(result,err );
+    console.log(result, err);
     res.writeHead(200, {
       'Content-Type': 'text/plain'
     });
-    res.end(JSON.stringify(err ? err : (result && result['password'] && passwordHash.verify(req.body.password, result['password'])) ? result : "Unsuccessful Login"))
+    if (result && result['password'] && passwordHash.verify(req.body.password, result['password'])) {
+      const token = jwt.sign({_id:result._id}, config.secret, {
+        expiresIn: 1008000
+      })
+      // var data = {
+      //   result: result,
+      //   token: token
+      // };
+      // delete data.result.password;
+      var data = JSON.parse(JSON.stringify(result));
+      delete data.password;
+      data.token = token;
+      res.end(JSON.stringify(data));
+    } else {
+      res.end("Unsuccessful Login");
+    }
+    // res.end(JSON.stringify(err ? err : (result && result['password'] && passwordHash.verify(req.body.password, result['password'])) ? result : "Unsuccessful Login")+ token)
   });
 });
 
 
-app.get('/fetchUsers', async function (req, res) {
+app.get('/fetchUsers', checkAuth, async function (req, res) {
   await UserProfile.find(function (err, result) {
     // console.log(result);
     res.writeHead(200, {
@@ -114,7 +133,7 @@ app.get('/fetchUsers', async function (req, res) {
 });
 
 
-app.post('/newGroup', async function (req, res) {
+app.post('/newGroup', checkAuth, async function (req, res) {
   var users = [];
   req.body.userIDArray.forEach(user => {
     const userData = {
@@ -140,7 +159,7 @@ app.post('/newGroup', async function (req, res) {
 });
 
 
-app.post('/fetchGroups', async function (req, res) {
+app.post('/fetchGroups', checkAuth, async function (req, res) {
   // console.log(req.body);
   await Group.find({ "user.user_id": req.body.user_id }, function (err, result) {
     // await UserGroup.find({ "user.user_id": { $all: req.body.user_id } }, function (err, result) {
@@ -203,7 +222,7 @@ app.post('/fetchGroups', async function (req, res) {
   });
 });
 
-app.post('/acceptInvite', async function (req, res) {
+app.post('/acceptInvite', checkAuth, async function (req, res) {
   console.log(req.body);
   Group.find({ _id: req.body.group_id }, function (err, result) {
     console.log("brfore", result[0]['user']);
@@ -223,7 +242,7 @@ app.post('/acceptInvite', async function (req, res) {
   })
 });
 
-app.post('/addExpense', async function (req, res) {
+app.post('/addExpense', checkAuth, async function (req, res) {
   if (req.body.group_id && req.body.description && req.body.amount && req.body.paid_by) {
     // TODO check error
     let users = [];
@@ -234,7 +253,7 @@ app.post('/addExpense', async function (req, res) {
           users.push(user.user_id);
         }
       });
-      console.log(users,users.length);
+      console.log(users, users.length);
       var splitAmount = (req.body.amount / users.length).toFixed(2);
       var unevenSplit = (req.body.amount - (users.length - 1) * splitAmount).toFixed(2);
       let paid_to_users = [];
@@ -246,15 +265,15 @@ app.post('/addExpense', async function (req, res) {
         })
       });
       let data = {
-        group_id:req.body.group_id,
-        description:req.body.description,
-        paid_by:req.body.paid_by,
+        group_id: req.body.group_id,
+        description: req.body.description,
+        paid_by: req.body.paid_by,
         paid_to_users: paid_to_users,
-        amount:req.body.amount
+        amount: req.body.amount
       }
       const expenses = new Expenses(data);
       await expenses.save(function (err, result) {
-        console.log("added",result);
+        console.log("added", result);
       });
       res.writeHead(200, {
         'Content-Type': 'text/plain'
@@ -265,7 +284,7 @@ app.post('/addExpense', async function (req, res) {
 });
 
 
-app.post('/getAllExpenses', async function (req, res) {
+app.post('/getAllExpenses', checkAuth, async function (req, res) {
   Expenses.find({ group_id: req.body.group_id })
     .populate('group_id', ["name"])
     .populate('paid_by', ["name"])
@@ -277,24 +296,24 @@ app.post('/getAllExpenses', async function (req, res) {
       console.log("res", result);
       let data = [];
       result.forEach(exp => {
-          let obj = {
-            created_date:exp.created_date,
-            updated_date:exp.updated_date,
-            group_id:exp.group_id._id,
-            description:exp.description,
-            paid_by:exp.paid_by._id,
-            name:exp.paid_by.name,
-            paid_by_name:exp.paid_by.name,
-            amount: exp.amount
-          }
-          data.push(obj);
+        let obj = {
+          created_date: exp.created_date,
+          updated_date: exp.updated_date,
+          group_id: exp.group_id._id,
+          description: exp.description,
+          paid_by: exp.paid_by._id,
+          name: exp.paid_by.name,
+          paid_by_name: exp.paid_by.name,
+          amount: exp.amount
+        }
+        data.push(obj);
       });
       // console.log("final", data);
       res.end(JSON.stringify(data));
     });
 });
 
-app.post('/getAllIndividualExpenses', async function (req, res) {
+app.post('/getAllIndividualExpenses', checkAuth, async function (req, res) {
   Expenses.find({ group_id: req.body.group_id })
     .populate('group_id', ["name"])
     .populate('paid_by', ["name"])
@@ -332,112 +351,112 @@ app.post('/getAllIndividualExpenses', async function (req, res) {
     });
 });
 
-app.post('/getAllUserExpenses', async function (req, res) {
+app.post('/getAllUserExpenses', checkAuth, async function (req, res) {
   // Group.find(function(err,result){
   //   result.forEach(resul=>{
   //     console.log(resul.user);
   //   })
   // });
   Expenses.find({
-    "paid_to_users.paid_to":req.body.user_id
+    "paid_to_users.paid_to": req.body.user_id
   })
-  .populate("paid_to_users.paid_to",["name"])
-  .lean()
-  .then((result) => {
-    res.writeHead(200, {
-      'Content-Type': 'text/plain'
-    });
-    // console.log("res", result);
-    let data = [];
-    result.forEach(exp => {
-      exp.paid_to_users.forEach(paid_to_user => {
-        // console.log(paid_to_user);
-        if(paid_to_user.settled =='N'){
-          let obj = {
-          created_date:exp.created_date,
-          updated_date:exp.updated_date,
-          group_id:exp.group_id._id,
-          description:exp.description,
-          paid_by:exp.paid_by._id,
-          paid_by_name:exp.paid_by.name,
-        }
-        obj.paid_to=paid_to_user.paid_to._id;
-        obj.paid_to_name=paid_to_user.paid_to.name;
-        obj.name=paid_to_user.paid_to.name;
-        obj.amount = paid_to_user.amount;
-        obj.settled = paid_to_user.settled;
-        data.push(obj);
-        }
+    .populate("paid_to_users.paid_to", ["name"])
+    .lean()
+    .then((result) => {
+      res.writeHead(200, {
+        'Content-Type': 'text/plain'
       });
+      // console.log("res", result);
+      let data = [];
+      result.forEach(exp => {
+        exp.paid_to_users.forEach(paid_to_user => {
+          // console.log(paid_to_user);
+          if (paid_to_user.settled == 'N') {
+            let obj = {
+              created_date: exp.created_date,
+              updated_date: exp.updated_date,
+              group_id: exp.group_id._id,
+              description: exp.description,
+              paid_by: exp.paid_by._id,
+              paid_by_name: exp.paid_by.name,
+            }
+            obj.paid_to = paid_to_user.paid_to._id;
+            obj.paid_to_name = paid_to_user.paid_to.name;
+            obj.name = paid_to_user.paid_to.name;
+            obj.amount = paid_to_user.amount;
+            obj.settled = paid_to_user.settled;
+            data.push(obj);
+          }
+        });
+      });
+      // console.log("final", data);
+      res.end(JSON.stringify(data));
     });
-    // console.log("final", data);
-    res.end(JSON.stringify(data));
-  });
-  
+
   // SELECT e.group_id,e.description,e.paid_by,e.paid_to,u.name,e.settled,e.amount,e.created_date FROM expenses_table AS e 
   // INNER JOIN user_profile_table AS u ON e.paid_to=u.rec_id 
   // WHERE group_id in (SELECT group_id from user_group_table where user_id = '${req.body.user_id}')  and e.settled='N' order by e.created_date desc`;
 });
 
 
-app.post('/settleUp', async function (req, res) {
+app.post('/settleUp', checkAuth, async function (req, res) {
   console.log(req.body)
-  Expenses.find({"paid_to_users.paid_to":req.body.paid_to,"paid_by":req.body.paid_by})
-  // .populate("paid_to_users.paid_to",["name"])
-  .lean()
-  .then((result) => {
-    res.writeHead(200, {
-      'Content-Type': 'text/plain'
-    });
-    result.forEach(exp => {
-      exp.paid_to_users.forEach(paid_to_user => {
-        if(req.body.paid_to==paid_to_user.paid_to && req.body.paid_by==exp.paid_by){
-          paid_to_user.settled = 'Y';
-          console.log("found",paid_to_user);
-        }
+  Expenses.find({ "paid_to_users.paid_to": req.body.paid_to, "paid_by": req.body.paid_by })
+    // .populate("paid_to_users.paid_to",["name"])
+    .lean()
+    .then((result) => {
+      res.writeHead(200, {
+        'Content-Type': 'text/plain'
       });
-      const updatedArray = exp.paid_to_users;
-      const updateDocument = {
-        $set: { "paid_to_users": updatedArray,"updated_date": new Date() }
-      };
-      console.log(updatedArray,"updatedocccccc");
+      result.forEach(exp => {
+        exp.paid_to_users.forEach(paid_to_user => {
+          if (req.body.paid_to == paid_to_user.paid_to && req.body.paid_by == exp.paid_by) {
+            paid_to_user.settled = 'Y';
+            console.log("found", paid_to_user);
+          }
+        });
+        const updatedArray = exp.paid_to_users;
+        const updateDocument = {
+          $set: { "paid_to_users": updatedArray, "updated_date": new Date() }
+        };
+        console.log(updatedArray, "updatedocccccc");
 
-      Expenses.updateOne({_id:exp._id},updateDocument,function(err,result){
-        console.log("done",result);
-      })
+        Expenses.updateOne({ _id: exp._id }, updateDocument, function (err, result) {
+          console.log("done", result);
+        })
+      });
+      // console.log("final after change", result);
+      // result.forEach(resu=>{
+      //   console.log(resu.paid_to_users);
+      // })
+      // const updatedArray = result.paid_to_users;
+      // Expenses.updateMany(result);
+      // Expenses.updateMany(result);
+
+      // const query = {"paid_to_users.paid_to":req.body.paid_to,"paid_by":req.body.paid_by};
+      // const updateDocument = {
+      //   $set: { "paid_to_users.$.size": "extra large" }
+      // };
+      // const result = await pizza.updateOne(query, updateDocument);
+
+
+      res.end(JSON.stringify(result));
     });
-    // console.log("final after change", result);
-    // result.forEach(resu=>{
-    //   console.log(resu.paid_to_users);
-    // })
-    // const updatedArray = result.paid_to_users;
-    // Expenses.updateMany(result);
-    // Expenses.updateMany(result);
-
-    // const query = {"paid_to_users.paid_to":req.body.paid_to,"paid_by":req.body.paid_by};
-    // const updateDocument = {
-    //   $set: { "paid_to_users.$.size": "extra large" }
-    // };
-    // const result = await pizza.updateOne(query, updateDocument);
-
-
-    res.end(JSON.stringify(result));
-  });
   // var sql = `UPDATE expenses_table SET settled='Y', updated_date=NOW() WHERE (paid_by=${req.body.paid_by} and paid_to=${req.body.paid_to}) or (paid_by=${req.body.paid_to} and paid_to=${req.body.paid_by})`;
 });
 
-app.post('/updateUserProfile', async function (req, res) {
-  UserProfile.findOneAndUpdate({_id:req.body.id},req.body)
-  .then(result=>{
+app.post('/updateUserProfile', checkAuth, async function (req, res) {
+  UserProfile.findOneAndUpdate({ _id: req.body.id }, req.body)
+    .then(result => {
       res.writeHead(200, {
-    'Content-Type': 'text/plain'
-  });
-  res.end(JSON.stringify(result));
-  })
+        'Content-Type': 'text/plain'
+      });
+      res.end(JSON.stringify(result));
+    })
 });
 
 
-app.post('/getAllUserExpensesForRecentActivities', async function (req, res) {
+app.post('/getAllUserExpensesForRecentActivities', checkAuth, async function (req, res) {
 
 
   // SELECT e.group_id,g.name as group_name,e.description,e.paid_by,e.paid_to,u.name,e.settled,SUM(e.amount) as amount,e.created_date, e.updated_date FROM expenses_table AS e 
@@ -446,11 +465,11 @@ app.post('/getAllUserExpensesForRecentActivities', async function (req, res) {
   // WHERE group_id in (
   //   SELECT group_id from user_group_table where user_id = '${req.body.user_id}'
   //   ) group by e.description order by e.updated_date desc, e.created_date desc`;
-  
+
 });
 
 
-// app.post('/getGroupMembers', async function (req, res) {
+// app.post('/getGroupMembers', checkAuth, async function (req, res) {
 //   // console.log(req.body);
 //   var sql = `SELECT DISTINCT u.user_id,p.name as name,p.email as email FROM user_group_table AS u INNER JOIN user_profile_table AS p ON p.rec_id=u.user_id WHERE u.group_id='${req.body.group_id}'`;
 //   await connection.query(sql, function (error, result) {
@@ -470,7 +489,7 @@ app.post('/getAllUserExpensesForRecentActivities', async function (req, res) {
 // });
 
 
-// app.post('/updateGroup', async function (req, res) {
+// app.post('/updateGroup', checkAuth, async function (req, res) {
 //   console.log(req.body);
 //   var sql = `UPDATE group_info_table SET name='${req.body.name}' WHERE rec_id='${req.body.group_id}'`;
 //   await connection.query(sql, function (error, result) {
@@ -491,28 +510,28 @@ app.post('/getAllUserExpensesForRecentActivities', async function (req, res) {
 // });
 
 
-app.post('/exitGroup', async function (req, res) {
+app.post('/exitGroup', checkAuth, async function (req, res) {
   console.log(req.body);
-  Group.findOne({_id:req.body.group_id})
-  .lean()
-  .then(result=>{
-    var userList = [];
-    result.user.forEach(user=>{
-      console.log("checking", user.user_id,req.body.user_id);
-      if(user.user_id != req.body.user_id){
-        userList.push(user);
-      }
-    });
-    result.user = userList;
-    console.log("result after user remove",result,userList);
-    Group.findOneAndUpdate({ _id: req.body.group_id }, result)
-      .then(result => {
-        res.writeHead(200, {
-          'Content-Type': 'text/plain'
-        });
-        res.end(JSON.stringify(result));
-      })
-  })
+  Group.findOne({ _id: req.body.group_id })
+    .lean()
+    .then(result => {
+      var userList = [];
+      result.user.forEach(user => {
+        console.log("checking", user.user_id, req.body.user_id);
+        if (user.user_id != req.body.user_id) {
+          userList.push(user);
+        }
+      });
+      result.user = userList;
+      console.log("result after user remove", result, userList);
+      Group.findOneAndUpdate({ _id: req.body.group_id }, result)
+        .then(result => {
+          res.writeHead(200, {
+            'Content-Type': 'text/plain'
+          });
+          res.end(JSON.stringify(result));
+        })
+    })
 });
 
 // app.post('/uploadUserProfilePicture', (req, res) => {

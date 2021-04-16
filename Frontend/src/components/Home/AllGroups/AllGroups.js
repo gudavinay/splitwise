@@ -64,7 +64,7 @@ class AllGroups extends Component {
                 {groupsInfoJSON && groupsInfoJSON.length===0 && <span style={{fontWeight:'bold', color:'#999'}}>No groups found. Please try creating a group in dashboard.</span>}
                 <Table striped borderless >
                     <tbody>
-                        {groupsInfoJSON.map(group => {
+                        {groupsInfoJSON && groupsInfoJSON.map(group => {
                             return <tr style={{ height: '5rem' }}>
                                 <td style={{ verticalAlign: 'middle' }}>
                                     <h4>

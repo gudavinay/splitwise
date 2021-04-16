@@ -75,6 +75,10 @@ export function getDateFromUtils(date){
     return localDate.getDate();
 }
 
+export function getToken(){
+    return "JWT "+getUserProfile().token;
+}
+
 export function fetchGroupName(group_id){
     let groupData = getGroupsInfo();
     if(groupData && groupData.length!==0){

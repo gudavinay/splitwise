@@ -32,5 +32,5 @@ const UserProfileSchema = new mongoose.Schema(
         }
     }
 );
-const UserProfile = mongoose.model("UserProfile", UserProfileSchema);
-module.exports = UserProfile;
+
+module.exports = mongoose.model("UserProfile", UserProfileSchema);
