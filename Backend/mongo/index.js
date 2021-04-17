@@ -247,15 +247,13 @@ app.post('/addExpense', checkAuth, async function (req, res) {
     // TODO check error
     let users = [];
     Group.find({ _id: req.body.group_id }, async function (err, result) {
-      console.log(result);
       result[0]['user'].forEach(user => {
-        if (user.isAccepted == 1) {
+        if (user.isAccepted == 1 && user.user_id != req.body.paid_by) {
           users.push(user.user_id);
         }
       });
-      console.log(users, users.length);
-      var splitAmount = (req.body.amount / users.length).toFixed(2);
-      var unevenSplit = (req.body.amount - (users.length - 1) * splitAmount).toFixed(2);
+      var splitAmount = (req.body.amount / (users.length+1)).toFixed(2);
+      var unevenSplit = (req.body.amount - (users.length) * splitAmount).toFixed(2);
       let paid_to_users = [];
       users.forEach((user, index) => {
         paid_to_users.push({
@@ -297,6 +295,7 @@ app.post('/getAllExpenses', checkAuth, async function (req, res) {
       let data = [];
       result.forEach(exp => {
         let obj = {
+          _id: exp._id,
           created_date: exp.created_date,
           updated_date: exp.updated_date,
           group_id: exp.group_id._id,
@@ -304,7 +303,8 @@ app.post('/getAllExpenses', checkAuth, async function (req, res) {
           paid_by: exp.paid_by._id,
           name: exp.paid_by.name,
           paid_by_name: exp.paid_by.name,
-          amount: exp.amount
+          amount: exp.amount,
+          notes:["hello"]
         }
         data.push(obj);
       });
@@ -358,15 +358,16 @@ app.post('/getAllUserExpenses', checkAuth, async function (req, res) {
   //   })
   // });
   Expenses.find({
-    "paid_to_users.paid_to": req.body.user_id
-  })
-    .populate("paid_to_users.paid_to", ["name"])
+  }).or([{"paid_to_users.paid_to": req.body.user_id},
+  {"paid_by": req.body.user_id}])
+  .populate("paid_to_users.paid_to", ["name"])
+  .populate("paid_by", ["name"])
     .lean()
     .then((result) => {
       res.writeHead(200, {
         'Content-Type': 'text/plain'
       });
-      // console.log("res", result);
+      console.log("res getAllUserExpenses", result);
       let data = [];
       result.forEach(exp => {
         exp.paid_to_users.forEach(paid_to_user => {
@@ -409,12 +410,26 @@ app.post('/settleUp', checkAuth, async function (req, res) {
         'Content-Type': 'text/plain'
       });
       result.forEach(exp => {
+        let countOfSettled = 0;
         exp.paid_to_users.forEach(paid_to_user => {
           if (req.body.paid_to == paid_to_user.paid_to && req.body.paid_by == exp.paid_by) {
             paid_to_user.settled = 'Y';
             console.log("found", paid_to_user);
           }
         });
+
+        exp.paid_to_users.forEach(paid_to_user => {
+          if(paid_to_user.settled == 'N'){
+            countOfSettled++;
+          }
+        });
+        console.log(countOfSettled,"countOfSettled");
+        if(countOfSettled == 1){
+          exp.paid_to_users.forEach(paid_to_user => {
+            paid_to_user.settled = 'Y';
+          });
+        }
+        
         const updatedArray = exp.paid_to_users;
         const updateDocument = {
           $set: { "paid_to_users": updatedArray, "updated_date": new Date() }
@@ -457,7 +472,18 @@ app.post('/updateUserProfile', checkAuth, async function (req, res) {
 
 
 app.post('/getAllUserExpensesForRecentActivities', checkAuth, async function (req, res) {
-
+  Expenses.find().or([{ "paid_to_users.paid_to": req.body.user_id}, {"paid_by": req.body.user_id }])
+    .populate("group_id",["name"])
+    .populate("paid_to_users.paid_to",["name"])
+    .populate("paid_by",["name"])
+    .lean()
+    .then((result) => {
+      res.writeHead(200, {
+        'Content-Type': 'text/plain'
+      });
+      console.log(result);
+      res.end(JSON.stringify(result));
+    });
 
   // SELECT e.group_id,g.name as group_name,e.description,e.paid_by,e.paid_to,u.name,e.settled,SUM(e.amount) as amount,e.created_date, e.updated_date FROM expenses_table AS e 
   // INNER JOIN user_profile_table AS u ON e.paid_by=u.rec_id 

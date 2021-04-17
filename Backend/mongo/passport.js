@@ -14,18 +14,14 @@ function auth() {
     passport.use(
         new JwtStrategy(opts, (jwt_payload, callback) => {
             const user_id = jwt_payload._id;
-            console.log(user_id, jwt_payload);
             UserProfile.findById(user_id, (err, results) => {
                 if (err) {
-                    console.log("JWT ERR");
                     return callback(err, false);
                 }
                 if (results) {
-                    console.log("JWT RESULTS");
                     callback(null, results);
                 }
                 else {
-                    console.log("JWT ELSE");
                     callback(null, false);
                 }
             });

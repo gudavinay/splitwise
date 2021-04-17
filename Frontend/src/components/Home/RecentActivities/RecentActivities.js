@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { Col, Row, Table } from 'react-bootstrap';
-import { getMonthFromUtils, getUserID, getDateFromUtils, getUserCurrency } from '../../Services/ControllerUtils';
-import notesSVG from '../../assets/notes.svg'
-import settledUp from '../../../images/settledup.png'
+import { getUserID, getUserCurrency } from '../../Services/ControllerUtils';
 import { connect } from 'react-redux';
 import { getAllUserExpensesForRecentActivitiesRedux } from '../../../reduxOps/reduxActions/recentActivitiesRedux'
+import SplitwiseRATable from './SplitwiseRATable'
 
 class RecentActivities extends Component {
     constructor(props) {
@@ -31,43 +30,23 @@ class RecentActivities extends Component {
 
     render() {
         // console.log("state in RA -----",this.state);
-        let tableData = "No data found.";
+        let noData = "No data found.";
         const userPreferredCurrency = getUserCurrency();
-        let dataToBeProcessed = this.state.groupSelected ? this.state.allUserExpensesForRA.filter(exp => exp.group_id === Number(this.state.selectedGroup)) : this.state.allUserExpensesForRA;
-        if (dataToBeProcessed && dataToBeProcessed.length > 0 && dataToBeProcessed[0] && dataToBeProcessed[0].group_id) {
-            tableData = [];
+        const newRows = [];
+        let dataToBeProcessed = this.state.groupSelected ? this.state.allUserExpensesForRA.filter(exp => exp.group_id._id == this.state.selectedGroup) : this.state.allUserExpensesForRA;
+        if (dataToBeProcessed && dataToBeProcessed.length > 0 && dataToBeProcessed[0] && dataToBeProcessed[0].group_id._id) {
             dataToBeProcessed.forEach(expense => {
-                let tableRow = (
-                    <tr>
-                        <td>
-                            <Row>
-                                <Col sm={1} style={{ margin: 'auto' }}>
-                                    <img style={{ height: '40px' }} src={expense.settled==='N'?notesSVG:settledUp} alt="" />
-                                </Col>
-                                <Col>
-                                {expense.settled==='N'?(<div>
-                                    <strong>{expense.paid_by === getUserID() ? "You" : expense.name}</strong> paid <strong>{userPreferredCurrency} {expense.amount}</strong> for <strong>"{expense.description}"</strong> in <strong>"{expense.group_name}"</strong>.<br />
-                                    <span style={{ color: '#999', fontSize: '12px' }}>{getMonthFromUtils(expense.created_date)} {getDateFromUtils(expense.created_date)} </span>
-                                </div>):(<div>
-                                    <strong>{expense.paid_by === getUserID() ? "You" : expense.name}</strong> settled up <strong>{userPreferredCurrency} {expense.amount}</strong> for <strong>"{expense.description}"</strong> in <strong>"{expense.group_name}"</strong>.<br />
-                                    <span style={{ color: '#999', fontSize: '12px' }}>{getMonthFromUtils(expense.updated_date)} {getDateFromUtils(expense.updated_date)} </span>
-                                </div>)}
-                                    </Col>
-
-                            </Row>
-                        </td>
-                    </tr>
-                );
-                tableData.push(tableRow);
+                newRows.push(expense)
             });
         }
-
-
+        if(newRows.length){
+            noData = null;
+        }
         let groupOptions = {};
         let groupOptionsToDisplay = [<option key="ALL_GROUP" id="ALL_GROUP">All Groups</option>];
         if (this.state.allUserExpensesForRA && this.state.allUserExpensesForRA.length > 0 && this.state.allUserExpensesForRA[0] && this.state.allUserExpensesForRA[0].group_id) {
             this.state.allUserExpensesForRA.forEach(expense => {
-                groupOptions[expense.group_id] = expense.group_name;
+                groupOptions[expense.group_id._id] = expense.group_id.name;
             });
         }
         Object.keys(groupOptions).forEach(index => {
@@ -75,6 +54,7 @@ class RecentActivities extends Component {
         })
         return (
             <React.Fragment>
+                
                 <Table bordered hover style={{ width: '98%', margin: 'auto' }}>
                     <tbody>
                         <tr style={{ background: '#eee' }}>
@@ -115,7 +95,11 @@ class RecentActivities extends Component {
 
                             </td>
                         </tr>
-                        {tableData}
+
+                        <div style={{ height: '100%', width: '100%' }}>
+                            {!noData && <SplitwiseRATable rows={newRows} rowsPerPage={2}></SplitwiseRATable>}
+                        </div>
+                        {noData}
                     </tbody>
                 </Table>
                 {/* {JSON.stringify(this.state.allUserExpensesForRA)} */}
@@ -132,3 +116,27 @@ const mapStateToProps = state =>{
 }
 
 export default connect(mapStateToProps, {getAllUserExpensesForRecentActivitiesRedux})(RecentActivities);
+
+// expense.paid_to_users.forEach(paid_to=>{
+//     let expenseRow = (
+//         <tr>
+//             <td>
+//         <Row>
+//             <Col sm={1} style={{ margin: 'auto' }}>
+//                 <img style={{ height: '40px' }} src={paid_to.settled === 'N' ? notesSVG : settledUp} alt="" />
+//             </Col>
+//             <Col>
+//                 {paid_to.settled === 'N' ? (<div>
+//                     <strong>{expense.paid_by._id === getUserID() ? "You" : expense.paid_by.name}</strong> paid <strong>{userPreferredCurrency} {expense.amount}</strong> for <strong>"{expense.description}"</strong> in <strong>"{expense.group_id.name}"</strong>.<br />
+//                     <span style={{ color: '#999', fontSize: '12px' }}>{getMonthFromUtils(expense.created_date)} {getDateFromUtils(expense.created_date)} </span>
+//                 </div>) : (<div>
+//                     <strong>{expense.paid_by._id === getUserID() ? "You" : expense.paid_by.name}</strong> settled up <strong>{userPreferredCurrency} {expense.amount}</strong> for <strong>"{expense.description}"</strong> in <strong>"{expense.group_id.name}"</strong>.<br />
+//                     <span style={{ color: '#999', fontSize: '12px' }}>{getMonthFromUtils(expense.updated_date)} {getDateFromUtils(expense.updated_date)} </span>
+//                 </div>)}
+//             </Col>
+//         </Row>
+//         </td>
+//     </tr>
+//     );
+//     tableData.push(expenseRow);
+// });

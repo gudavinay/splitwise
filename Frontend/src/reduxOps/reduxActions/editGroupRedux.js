@@ -1,8 +1,10 @@
 import Axios from "axios";
 import backendServer from '../../webConfig';
 import { GROUP_MEMBERS, UPDATE_GROUP, ERROR  } from "../types";
+import { getToken } from '../../components/Services/ControllerUtils';
 
 export const getGroupMembersRedux = (data) => async dispatch => { 
+    Axios.defaults.headers.common['authorization'] = getToken();
     await Axios.post(`${backendServer}/getGroupMembers`, data)
         .then(response => {
             console.log("response recieved from getGroupMembers req", response);
@@ -21,6 +23,7 @@ export const getGroupMembersRedux = (data) => async dispatch => {
 }
 
 export const updateGroupRedux = (data) => async dispatch => { 
+    Axios.defaults.headers.common['authorization'] = getToken();
     await Axios.post(`${backendServer}/updateGroup`, data)
         .then(response => {
             console.log("response recieved from updateGroup req", response);

@@ -1,8 +1,10 @@
 import Axios from "axios";
 import backendServer from '../../webConfig';
 import { SETTLE_UP, ERROR, GET_ALL_USER_EXPENSES } from "../types";
+import { getToken } from '../../components/Services/ControllerUtils';
 
 export const getAllUserExpensesRedux = (data) => async dispatch => { 
+    Axios.defaults.headers.common['authorization'] = getToken();
     await Axios.post(`${backendServer}/getAllUserExpenses`, data)
         .then(response => {
             console.log("response recieved from getAllUserExpenses req", response);
@@ -21,6 +23,7 @@ export const getAllUserExpensesRedux = (data) => async dispatch => {
 }
 
 export const settleUpRedux = (data) => async dispatch => { 
+    Axios.defaults.headers.common['authorization'] = getToken();
     await Axios.post(`${backendServer}/settleUp`, data)
         .then(response => {
             console.log("response recieved from settleUp req", response);

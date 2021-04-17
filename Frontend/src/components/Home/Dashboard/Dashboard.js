@@ -50,11 +50,16 @@ class Dashboard extends Component {
         let userExpense = {};
         let userExpenseTotal = {};
         let userExpenseNames = {};
+        userExpense[getUserID()] = 0;
+        userExpenseTotal[getUserID()] = 0;
         if (this.state.allUserExpenses && this.state.allUserExpenses.length > 0) {
             this.state.allUserExpenses.forEach(expense => {
                 userExpense[expense.paid_to] = 0;
                 userExpenseTotal[expense.paid_to] = 0;
                 userExpenseNames[expense.paid_to] = expense.name;
+                userExpense[expense.paid_by] = 0;
+                userExpenseTotal[expense.paid_by] = 0;
+                userExpenseNames[expense.paid_by] = expense.name;
             })
             this.state.allUserExpenses.forEach(expense => {
                 if (expense.paid_to === userID)
@@ -76,7 +81,7 @@ class Dashboard extends Component {
 
         Object.keys(userExpense).forEach(index => {
             let rowData = null;
-            if (Number(index) !== userID) {
+            if (index != userID) {
                 if (userExpense[index] > 0) {
                     youAreOwed += Number(userExpense[index]);
                     rowData = (<tr><td><Col><Row>{userExpenseNames[index]}</Row><Row><span style={{ fontSize: '12px', padding: '0', color: '#5bc5a7' }}> owes you<span style={{ fontSize: '14px', fontWeight: 'bold' }}> {userPreferredCurrency} {userExpense[index]}</span></span></Row></Col></td></tr>);

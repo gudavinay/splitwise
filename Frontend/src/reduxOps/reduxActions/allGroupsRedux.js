@@ -1,7 +1,7 @@
 import Axios from "axios";
 import backendServer from '../../webConfig';
 import { ACCEPT_INVITE,FETCH_GROUPS,ERROR  } from "../types";
-import { getToken } from '../../components/Services/ControllerUtils'
+import { getToken } from '../../components/Services/ControllerUtils';
 
 export const fetchGroupsRedux = (data) => async dispatch => { 
     Axios.defaults.headers.common['authorization'] = getToken();
@@ -23,6 +23,7 @@ export const fetchGroupsRedux = (data) => async dispatch => {
 }
 
 export const acceptInviteRedux = (data) => async dispatch => { 
+    Axios.defaults.headers.common['authorization'] = getToken();
     await Axios.post(`${backendServer}/acceptInvite`, data)
         .then(response => {
             console.log("response recieved from acceptInvite req", response);

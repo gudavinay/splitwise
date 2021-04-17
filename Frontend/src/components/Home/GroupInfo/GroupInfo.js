@@ -5,6 +5,9 @@ import "../../splitwise.css";
 import notesSVG from '../../assets/notes.svg';
 import { Link } from "react-router-dom";
 import settingsSVG from '../../assets/settings.svg'
+import downArrowSVG from '../../assets/downArrow.svg'
+import upArrowSVG from '../../assets/upArrow.svg'
+import chatSVG from '../../assets/chat.svg'
 import { connect } from 'react-redux';
 import { getAllExpensesRedux, getAllIndividualExpensesRedux, addExpenseRedux, exitGroupRedux } from '../../../reduxOps/reduxActions/groupsInfoRedux';
 
@@ -38,6 +41,12 @@ class GroupInfo extends Component {
   }
 
 
+  onPost = async (event) => {
+    event.preventDefault();
+    console.log(event.target.value,event.target.id,this.state[event.target.id+":"]);
+  }
+
+
   componentDidUpdate(prevState) {
     if (prevState.allExpenses !== this.props.allExpenses) {
       this.setState({ allExpenses: this.props.allExpenses })
@@ -54,6 +63,7 @@ class GroupInfo extends Component {
   }
 
   render() {
+    console.log("STATE in GROU INFOOOO---", this.state);
     const userPreferredCurrency = getUserCurrency();
     let disableExitGroup = false;
     const { id } = this.props.match.params;
@@ -67,14 +77,44 @@ class GroupInfo extends Component {
         let tableRow = (
           <tr>
             <td>
-              <Row>
+              <Row >
                 <Col sm={1} style={{ paddingLeft: '2rem', color: '#999' }}>
                   <Row style={{ fontSize: '12px' }}>{getMonthFromUtils(expense.created_date)}</Row>
                   <Row style={{ fontSize: '20px' }}>{getDateFromUtils(expense.created_date)}</Row>
                 </Col>
                 <Col sm={7} style={{ margin: 'auto' }}>{expense.description}</Col>
-                <Col sm={4} style={{ color: '#999' }}><strong>{expense.paid_by === getUserID() ? `You ` : expense.paid_by_name}</strong> paid<br /><span style={{ color: 'black' }}><strong>{currencyConverter(userProfileJSON.currency)} {expense.amount}</strong></span></Col>
+                <Col sm={2} style={{ color: '#999' }}><strong>{expense.paid_by === getUserID() ? `You ` : expense.paid_by_name}</strong> paid<br /><span style={{ color: 'black' }}><strong>{currencyConverter(userProfileJSON.currency)} {expense.amount}</strong></span></Col>
+                <Col sm={1}  style={{ margin: 'auto' }}>
+                  {expense.notes?<img alt="" src={chatSVG} />:""}
+                </Col>
+                <Col sm={1} style={{ margin: 'auto' }}>
+                  <div>
+                    <img id={expense._id} onClick={(e) => {
+                      let key = e.target.id;
+                      var obj = {};
+                      obj[key] = !(this.state[e.target.id]);
+                      this.setState(obj)
+                    }} style={{ padding: '0px 4px' }} src={this.state[expense._id] ? upArrowSVG : downArrowSVG} alt="" />
+                  </div>
+                </Col>
               </Row>
+
+              <Collapse in={this.state[expense._id]}>
+                <div>
+                  <hr/>
+                  <span>Notes and Comments</span>
+                  <form id={expense._id} onSubmit={this.onPost}>
+                    <textarea id={expense._id} type="text" className="form-control" name="notes" onChange={(e) => {
+                      let key = e.target.id + ":"; //to denote the notes
+                      var obj = {};
+                      obj[key] = e.target.value;
+                      this.setState(obj)
+                    }} placeholder="Add a comment" title="Please enter any Comments" required />
+
+                    <Button type="submit" className="btn btn-success" style={{ backgroundColor: '#FF6139', borderColor: '#FF6139', textDecoration: 'none', margin: '5px 12px', padding: '1%', fontSize: '10px', fontWeight: 'bolder', float: 'right' }}>Post</Button>
+                  </form>
+                </div>
+              </Collapse>
             </td>
           </tr>
         );
@@ -88,19 +128,26 @@ class GroupInfo extends Component {
     let groupBalances = "No data found.";
     userExpense[getUserID()] = 0;
     if (this.state.allIndividualExpenses && this.state.allIndividualExpenses.length > 0 && this.state.allIndividualExpenses[0] && this.state.allIndividualExpenses[0].group_id && this.state.allExpenses && this.state.allExpenses.length > 0 && this.state.allExpenses[0] && this.state.allExpenses[0].group_id) {
-      this.state.allExpenses.forEach(expense => {
-        userExpense[expense.paid_by] = 0;
-        userExpenseNames[expense.paid_by] = expense.name;
-      });
+      // this.state.allExpenses.forEach(expense => {
+      //   userExpense[expense.paid_by] = 0;
+      //   userExpenseNames[expense.paid_by] = expense.name;
+      // });
       this.state.allIndividualExpenses.forEach(expense => {
         userExpense[expense.paid_to] = 0;
         userExpenseNames[expense.paid_to] = expense.name;
       });
-      this.state.allExpenses.forEach(expense => {
-        userExpense[expense.paid_by] = (Number(userExpense[expense.paid_by]) - Number(expense.amount)).toFixed(2);
+      this.state.allIndividualExpenses.forEach(expense => {
+        userExpense[expense.paid_by] = 0;
+        userExpenseNames[expense.paid_by] = expense.paid_by_name;
       });
+      // this.state.allExpenses.forEach(expense => {
+      //   userExpense[expense.paid_by] = (Number(userExpense[expense.paid_by]) - Number(expense.amount)).toFixed(2);
+      // });
       this.state.allIndividualExpenses.forEach(expense => {
         userExpense[expense.paid_to] = (Number(userExpense[expense.paid_to]) + Number(expense.amount)).toFixed(2);
+      });
+      this.state.allIndividualExpenses.forEach(expense => {
+        userExpense[expense.paid_by] = (Number(userExpense[expense.paid_by]) - Number(expense.amount)).toFixed(2);
       });
 
       console.log(JSON.stringify(userExpense));
@@ -222,8 +269,8 @@ class GroupInfo extends Component {
             </Modal.Body>
           </Modal>
         </div>
-        {/* {JSON.stringify(this.state.allIndividualExpenses)}
-        {JSON.stringify(this.state.allExpenses)}
+        {/* {JSON.stringify(this.state.allIndividualExpenses)}  */}
+        {/* {JSON.stringify(this.state.allExpenses)}
         {JSON.stringify(userExpense)} */}
       </React.Fragment>
     );

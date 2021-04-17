@@ -1,8 +1,10 @@
 import Axios from "axios";
 import backendServer from '../../webConfig';
 import { FETCH_USERS, NEW_GROUP, ERROR, UPLOAD_USER_PROFILE_PICTURE  } from "../types";
+import { getToken } from '../../components/Services/ControllerUtils';
 
 export const fetchUsersRedux = (data) => async dispatch => { 
+    Axios.defaults.headers.common['authorization'] = getToken();
     await Axios.post(`${backendServer}/fetchUsers`, data)
         .then(response => {
             console.log("response recieved from fetchUsers req", response);
@@ -21,6 +23,7 @@ export const fetchUsersRedux = (data) => async dispatch => {
 }
 
 export const newGroupRedux = (data) => async dispatch => { 
+    Axios.defaults.headers.common['authorization'] = getToken();
     await Axios.post(`${backendServer}/newGroup`, data)
         .then(response => {
             console.log("response recieved from newGroup req", response);
@@ -38,6 +41,7 @@ export const newGroupRedux = (data) => async dispatch => {
         });
 }
 export const uploadUserProfilePictureRedux = (data) => async dispatch => { 
+    Axios.defaults.headers.common['authorization'] = getToken();
     await Axios.post(`${backendServer}/uploadUserProfilePicture`, data)
         .then(response => {
             console.log("response recieved from uploadUserProfilePicture req", response);
