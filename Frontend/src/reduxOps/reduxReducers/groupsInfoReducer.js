@@ -1,10 +1,12 @@
-import { ADD_EXPENSE, GET_ALL_EXPENSES, GET_ALL_INDIVIDUAL_EXPENSES, EXIT_GROUP } from "../types";
+import { ADD_EXPENSE, GET_ALL_EXPENSES, GET_ALL_INDIVIDUAL_EXPENSES, EXIT_GROUP, POST_COMMENT, DELETE_COMMENT } from "../types";
 
 const initialState = {
     allExpenses: {},
     allIndividualExpenses: {},
     addExpense: null,
-    exitGroup: null
+    exitGroup: null,
+    postComment: null,
+    deleteComment: null
 };
 
 export default function (state = initialState, action) {
@@ -21,6 +23,12 @@ export default function (state = initialState, action) {
         case EXIT_GROUP:
             console.log("reducing EXIT_GROUP type------", state);
             return { ...state, exitGroup: action.payload };
+        case POST_COMMENT:
+            console.log("reducing POST_COMMENT type------", state);
+            return { ...state, postComment: action.payload };
+        case DELETE_COMMENT:
+            console.log("reducing DELETE_COMMENT type------", state);
+            return { ...state, deleteComment: action.payload };
         default:
             return state;
     }

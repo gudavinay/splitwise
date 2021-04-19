@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Col, Collapse, Modal, OverlayTrigger, Row, Table, Tooltip } from "react-bootstrap";
+import { Alert, Button, Col, Collapse, Modal, OverlayTrigger, Row, Table, Tooltip } from "react-bootstrap";
 import { currencyConverter, getUserID, getUserProfile, getUserCurrency, getGroupsInfo, getMonthFromUtils, getDateFromUtils } from '../../Services/ControllerUtils'
 import "../../splitwise.css";
 import notesSVG from '../../assets/notes.svg';
@@ -8,8 +8,9 @@ import settingsSVG from '../../assets/settings.svg'
 import downArrowSVG from '../../assets/downArrow.svg'
 import upArrowSVG from '../../assets/upArrow.svg'
 import chatSVG from '../../assets/chat.svg'
+import crossSVG from '../../assets/cross.svg'
 import { connect } from 'react-redux';
-import { getAllExpensesRedux, getAllIndividualExpensesRedux, addExpenseRedux, exitGroupRedux } from '../../../reduxOps/reduxActions/groupsInfoRedux';
+import { getAllExpensesRedux, getAllIndividualExpensesRedux, addExpenseRedux, exitGroupRedux, postCommentRedux, deleteCommentRedux } from '../../../reduxOps/reduxActions/groupsInfoRedux';
 
 class GroupInfo extends Component {
   constructor(props) {
@@ -41,13 +42,26 @@ class GroupInfo extends Component {
   }
 
 
-  onPost = async (event) => {
-    event.preventDefault();
-    console.log(event.target.value,event.target.id,this.state[event.target.id+":"]);
+  onPost = async (e) => {
+    e.preventDefault();
+    console.log(e.target.value, e.target.id, this.state[e.target.id + ":"]);
+    await this.props.postCommentRedux({ user_id: getUserID(), expense_id: e.target.id, note: this.state[e.target.id + ":"] });
+  }
+
+  deleteComment = async (e) => {
+    e.preventDefault();
+    console.log(e.target.name, e.target.id);
+    if (window.confirm("Are you sure you want to delete this comment?")) {
+      await this.props.deleteCommentRedux({ expense_id: e.target.name, comment_id: e.target.id });
+    }
   }
 
 
-  componentDidUpdate(prevState) {
+  async componentDidUpdate(prevState) {
+    if(prevState.match.params.id != this.props.match.params.id){
+      await this.props.getAllExpensesRedux({ group_id: this.props.match.params.id });
+      await this.props.getAllIndividualExpensesRedux({ group_id: this.props.match.params.id });
+    }
     if (prevState.allExpenses !== this.props.allExpenses) {
       this.setState({ allExpenses: this.props.allExpenses })
     }
@@ -60,20 +74,50 @@ class GroupInfo extends Component {
     if (this.props.addExpense) {
       window.location.reload();
     }
+    if(prevState.postComment !== this.props.postComment){
+      await this.props.getAllExpensesRedux({ group_id: this.props.match.params.id });
+    }
+    if(prevState.deleteComment !== this.props.deleteComment){
+      await this.props.getAllExpensesRedux({ group_id: this.props.match.params.id });
+    }
   }
 
   render() {
-    console.log("STATE in GROU INFOOOO---", this.state);
+    // console.log("STATE in GROU INFOOOO---", this.state);
     const userPreferredCurrency = getUserCurrency();
     let disableExitGroup = false;
     const { id } = this.props.match.params;
     const currentGroupInfo = getGroupsInfo().find(group => group.group_id == id);
     var userProfileJSON = getUserProfile();
-    console.log("props in groupinfo", this.props, this.state);
+    // console.log("props in groupinfo", this.props, this.state);
     let tableData = "No data found. Please try adding an expense.";
     if (this.state.allExpenses && this.state.allExpenses.length > 0 && this.state.allExpenses[0] && this.state.allExpenses[0].group_id) {
       tableData = [];
+      console.log("inside allexppp",this.state.allExpenses);
       this.state.allExpenses.forEach(expense => {
+        let expenseNotesData = [];
+        if (expense.notes) {
+          expense.notes.forEach((note) => {
+            console.log("in note", note.note);
+            let noteData = (<Row>
+              <Col sm={1}>
+              </Col>
+              <Col sm={9}>
+                <Alert style={{ padding: '0' }}>
+                  <strong>{note.created_by.name}</strong> <span style={{ color: '#999', fontSize: '12px' }}><span>{getMonthFromUtils(note.created_date)}</span> <span>{getDateFromUtils(note.created_date)}</span></span>
+                  <textarea disabled id={note._id} key={note._id} className="form-control">{note.note}</textarea>
+                </Alert>
+              </Col>
+              <Col sm={2} style={{ margin: 'auto' }}>
+                {note.created_by._id == getUserID()? <img id={note._id} name={expense._id} src={crossSVG} alt="" onClick={(e) => { this.deleteComment(e); }} />:""}
+              </Col>
+            </Row>);
+            expenseNotesData.push(noteData);
+          })
+        }
+
+
+
         let tableRow = (
           <tr>
             <td>
@@ -84,8 +128,8 @@ class GroupInfo extends Component {
                 </Col>
                 <Col sm={7} style={{ margin: 'auto' }}>{expense.description}</Col>
                 <Col sm={2} style={{ color: '#999' }}><strong>{expense.paid_by === getUserID() ? `You ` : expense.paid_by_name}</strong> paid<br /><span style={{ color: 'black' }}><strong>{currencyConverter(userProfileJSON.currency)} {expense.amount}</strong></span></Col>
-                <Col sm={1}  style={{ margin: 'auto' }}>
-                  {expense.notes?<img alt="" src={chatSVG} />:""}
+                <Col sm={1} style={{ margin: 'auto' }}>
+                  {expense.notes && expense.notes.length>0 ? <img alt="" src={chatSVG} /> : ""}
                 </Col>
                 <Col sm={1} style={{ margin: 'auto' }}>
                   <div>
@@ -100,11 +144,14 @@ class GroupInfo extends Component {
               </Row>
 
               <Collapse in={this.state[expense._id]}>
-                <div>
-                  <hr/>
-                  <span>Notes and Comments</span>
+                <div style={{ padding: '0 3rem' }}>
+                  <hr />
+                  <div style={{ textAlign: 'center' }}>Notes and Comments</div>
+                  <Row>
+                  </Row>
                   <form id={expense._id} onSubmit={this.onPost}>
-                    <textarea id={expense._id} type="text" className="form-control" name="notes" onChange={(e) => {
+                    {expenseNotesData}
+                    <textarea id={expense._id} type="text" maxLength="150" className="form-control" name="notes" onChange={(e) => {
                       let key = e.target.id + ":"; //to denote the notes
                       var obj = {};
                       obj[key] = e.target.value;
@@ -283,9 +330,11 @@ const mapStateToProps = state => {
     allExpenses: state.groupsInfo.allExpenses,
     allIndividualExpenses: state.groupsInfo.allIndividualExpenses,
     addExpense: state.groupsInfo.addExpense,
-    exitGroup: state.groupsInfo.exitGroup
+    exitGroup: state.groupsInfo.exitGroup,
+    postComment: state.groupsInfo.postComment,
+    deleteComment: state.groupsInfo.deleteComment
   });
 }
 
-export default connect(mapStateToProps, { getAllExpensesRedux, getAllIndividualExpensesRedux, addExpenseRedux, exitGroupRedux })(GroupInfo);
+export default connect(mapStateToProps, { getAllExpensesRedux, getAllIndividualExpensesRedux, addExpenseRedux, exitGroupRedux, postCommentRedux, deleteCommentRedux })(GroupInfo);
 

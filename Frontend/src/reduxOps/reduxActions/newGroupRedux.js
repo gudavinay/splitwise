@@ -5,7 +5,7 @@ import { getToken } from '../../components/Services/ControllerUtils';
 
 export const fetchUsersRedux = (data) => async dispatch => { 
     Axios.defaults.headers.common['authorization'] = getToken();
-    await Axios.post(`${backendServer}/fetchUsers`, data)
+    await Axios.get(`${backendServer}/fetchUsers`, data)
         .then(response => {
             console.log("response recieved from fetchUsers req", response);
             dispatch({

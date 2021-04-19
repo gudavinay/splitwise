@@ -22,7 +22,12 @@ const ExpensesSchema = new mongoose.Schema(
             type: String
         },
         created_date: { type: Date, default: Date.now() },
-        updated_date: { type: Date, default: Date.now() }
+        updated_date: { type: Date, default: Date.now() },
+        notes:[{
+            note:{type: String},
+            created_by:{ type: Schema.Types.ObjectId, ref: "UserProfile" },
+            created_date: { type: Date, default: Date.now() }
+        }]
     }
 );
 

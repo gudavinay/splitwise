@@ -95,16 +95,16 @@ class NewGroup extends Component {
                                     <Row>
                                         <Col>
                                             <input style={{width:'51%', marginRight:'10px'}} id="newGroupPersons" onChange={(e) => this.setState({ selected: e.target.value })} type="text" list="email" placeholder="Search with Name or Email address"/>
-                                            <datalist onChange={(e) => console.log("onchange", e)} id="email">
+                                            {this.state.selected && this.state.selected.length>2?(<datalist onChange={(e) => console.log("onchange", e)} id="email">
                                                 {this.state.fetchUsers.map((element, index) =>
                                                     <option key={element.id} value={element.id}>{element.name} / {element.email}</option>
                                                 )}
-                                            </datalist>
+                                            </datalist>):""}
                                             <Button style={{ margin: '1rem' ,backgroundColor:'#5bc5a7' ,borderColor:'#5bc5a7'}} disabled={!this.state.selected} onClick={(event) => {
                                                 var tempList = this.state.selectedList;
                                                 tempList.push(this.state.selected);
                                                 var uniqueList = [...new Set(tempList)];
-                                                this.setState({ selectedList: uniqueList });
+                                                this.setState({ selectedList: uniqueList,selected:"" });
                                                 document.getElementById("newGroupPersons").value = '';
                                             }}>Add</Button>
                                         </Col>

@@ -68,14 +68,14 @@ app.get("/", (req, res) => {
   //   .catch(e => {
   //     console.log(e);
   //   })
-  const up = new UserProfile({ email: 'vinay@gmail.com' });
-  up.save();
+  // const up = new UserProfile({ email: 'vinay@gmail.com' });
+  // up.save();
   // UserProfile.save(function (err, book) {
   //   if (err) return console.error(err);
   //   console.log(book.name + " saved to bookstore collection.");
   // });
   // console.log(connection.collection('UserProfile').find());
-  res.send("Hello World");
+  // res.send("Hello World");
 });
 
 
@@ -97,12 +97,12 @@ app.post('/signup', async function (req, res) {
 
 app.post('/login', async function (req, res) {
   await UserProfile.findOne({ email: req.body.email.toUpperCase() }, function (err, result) {
-    console.log(result, err);
+    // console.log(result, err);
     res.writeHead(200, {
       'Content-Type': 'text/plain'
     });
     if (result && result['password'] && passwordHash.verify(req.body.password, result['password'])) {
-      const token = jwt.sign({_id:result._id}, config.secret, {
+      const token = jwt.sign({ _id: result._id }, config.secret, {
         expiresIn: 1008000
       })
       // var data = {
@@ -123,8 +123,9 @@ app.post('/login', async function (req, res) {
 
 
 app.get('/fetchUsers', checkAuth, async function (req, res) {
+  console.log("fetch users");
   await UserProfile.find(function (err, result) {
-    // console.log(result);
+    console.log(result,err);
     res.writeHead(200, {
       'Content-Type': 'text/plain'
     });
@@ -223,17 +224,17 @@ app.post('/fetchGroups', checkAuth, async function (req, res) {
 });
 
 app.post('/acceptInvite', checkAuth, async function (req, res) {
-  console.log(req.body);
+  // console.log(req.body);
   Group.find({ _id: req.body.group_id }, function (err, result) {
-    console.log("brfore", result[0]['user']);
+    // console.log("brfore", result[0]['user']);
     result[0]['user'].forEach(user => {
       if (user.user_id == req.body.user_id) {
         user.isAccepted = req.body.isAccepted;
       }
     });
-    console.log("after", result[0]['user']);
+    // console.log("after", result[0]['user']);
     Group.where({ _id: req.body.group_id }).updateOne({ user: result[0]['user'] }, function (err, result) {
-      console.log("updated");
+      // console.log("updated");
       res.writeHead(200, {
         'Content-Type': 'text/plain'
       });
@@ -252,7 +253,7 @@ app.post('/addExpense', checkAuth, async function (req, res) {
           users.push(user.user_id);
         }
       });
-      var splitAmount = (req.body.amount / (users.length+1)).toFixed(2);
+      var splitAmount = (req.body.amount / (users.length + 1)).toFixed(2);
       var unevenSplit = (req.body.amount - (users.length) * splitAmount).toFixed(2);
       let paid_to_users = [];
       users.forEach((user, index) => {
@@ -286,12 +287,13 @@ app.post('/getAllExpenses', checkAuth, async function (req, res) {
   Expenses.find({ group_id: req.body.group_id })
     .populate('group_id', ["name"])
     .populate('paid_by', ["name"])
+    .populate('notes.created_by', ["name"])
     .lean()
     .then((result) => {
       res.writeHead(200, {
         'Content-Type': 'text/plain'
       });
-      console.log("res", result);
+      // console.log("res", result);
       let data = [];
       result.forEach(exp => {
         let obj = {
@@ -304,7 +306,7 @@ app.post('/getAllExpenses', checkAuth, async function (req, res) {
           name: exp.paid_by.name,
           paid_by_name: exp.paid_by.name,
           amount: exp.amount,
-          notes:["hello"]
+          notes: exp.notes
         }
         data.push(obj);
       });
@@ -358,16 +360,16 @@ app.post('/getAllUserExpenses', checkAuth, async function (req, res) {
   //   })
   // });
   Expenses.find({
-  }).or([{"paid_to_users.paid_to": req.body.user_id},
-  {"paid_by": req.body.user_id}])
-  .populate("paid_to_users.paid_to", ["name"])
-  .populate("paid_by", ["name"])
+  }).or([{ "paid_to_users.paid_to": req.body.user_id },
+  { "paid_by": req.body.user_id }])
+    .populate("paid_to_users.paid_to", ["name"])
+    .populate("paid_by", ["name"])
     .lean()
     .then((result) => {
       res.writeHead(200, {
         'Content-Type': 'text/plain'
       });
-      console.log("res getAllUserExpenses", result);
+      // console.log("res getAllUserExpenses", result);
       let data = [];
       result.forEach(exp => {
         exp.paid_to_users.forEach(paid_to_user => {
@@ -401,7 +403,7 @@ app.post('/getAllUserExpenses', checkAuth, async function (req, res) {
 
 
 app.post('/settleUp', checkAuth, async function (req, res) {
-  console.log(req.body)
+  // console.log(req.body)
   Expenses.find({ "paid_to_users.paid_to": req.body.paid_to, "paid_by": req.body.paid_by })
     // .populate("paid_to_users.paid_to",["name"])
     .lean()
@@ -414,27 +416,27 @@ app.post('/settleUp', checkAuth, async function (req, res) {
         exp.paid_to_users.forEach(paid_to_user => {
           if (req.body.paid_to == paid_to_user.paid_to && req.body.paid_by == exp.paid_by) {
             paid_to_user.settled = 'Y';
-            console.log("found", paid_to_user);
+            // console.log("found", paid_to_user);
           }
         });
 
         exp.paid_to_users.forEach(paid_to_user => {
-          if(paid_to_user.settled == 'N'){
+          if (paid_to_user.settled == 'N') {
             countOfSettled++;
           }
         });
-        console.log(countOfSettled,"countOfSettled");
-        if(countOfSettled == 1){
+        // console.log(countOfSettled, "countOfSettled");
+        if (countOfSettled == 1) {
           exp.paid_to_users.forEach(paid_to_user => {
             paid_to_user.settled = 'Y';
           });
         }
-        
+
         const updatedArray = exp.paid_to_users;
         const updateDocument = {
           $set: { "paid_to_users": updatedArray, "updated_date": new Date() }
         };
-        console.log(updatedArray, "updatedocccccc");
+        // console.log(updatedArray, "updatedocccccc");
 
         Expenses.updateOne({ _id: exp._id }, updateDocument, function (err, result) {
           console.log("done", result);
@@ -472,16 +474,16 @@ app.post('/updateUserProfile', checkAuth, async function (req, res) {
 
 
 app.post('/getAllUserExpensesForRecentActivities', checkAuth, async function (req, res) {
-  Expenses.find().or([{ "paid_to_users.paid_to": req.body.user_id}, {"paid_by": req.body.user_id }])
-    .populate("group_id",["name"])
-    .populate("paid_to_users.paid_to",["name"])
-    .populate("paid_by",["name"])
+  Expenses.find().or([{ "paid_to_users.paid_to": req.body.user_id }, { "paid_by": req.body.user_id }])
+    .populate("group_id", ["name"])
+    .populate("paid_to_users.paid_to", ["name"])
+    .populate("paid_by", ["name"])
     .lean()
     .then((result) => {
       res.writeHead(200, {
         'Content-Type': 'text/plain'
       });
-      console.log(result);
+      // console.log(result);
       res.end(JSON.stringify(result));
     });
 
@@ -537,19 +539,19 @@ app.post('/getAllUserExpensesForRecentActivities', checkAuth, async function (re
 
 
 app.post('/exitGroup', checkAuth, async function (req, res) {
-  console.log(req.body);
+  // console.log(req.body);
   Group.findOne({ _id: req.body.group_id })
     .lean()
     .then(result => {
       var userList = [];
       result.user.forEach(user => {
-        console.log("checking", user.user_id, req.body.user_id);
+        // console.log("checking", user.user_id, req.body.user_id);
         if (user.user_id != req.body.user_id) {
           userList.push(user);
         }
       });
       result.user = userList;
-      console.log("result after user remove", result, userList);
+      // console.log("result after user remove", result, userList);
       Group.findOneAndUpdate({ _id: req.body.group_id }, result)
         .then(result => {
           res.writeHead(200, {
@@ -592,6 +594,27 @@ app.post('/exitGroup', checkAuth, async function (req, res) {
 //         res.sendFile(path.join(__dirname) + '/public/uploads/defaultProfilePicture.png')
 //     }
 // });
+
+
+app.post('/postComment', checkAuth, async function (req, res) {
+  Expenses.findOneAndUpdate({ _id: req.body.expense_id }, { $push: { "notes": { note:req.body.note, created_by: req.body.user_id } } }, { new: true }, function (err, result) {
+    // console.log("done", result);
+    res.writeHead(200, {
+      'Content-Type': 'text/plain'
+    });
+    res.end(JSON.stringify(result));
+  });
+});
+
+app.post('/deleteComment', checkAuth, async function (req, res) {
+  Expenses.findOneAndUpdate({ _id: req.body.expense_id }, { $pull: { "notes": { _id: req.body.comment_id } } }, function (err, result) {
+    console.log("done", result);
+    res.writeHead(200, {
+      'Content-Type': 'text/plain'
+    });
+    res.end(JSON.stringify(result));
+  });
+});
 
 //start your server on port 3002
 app.listen(3002);
