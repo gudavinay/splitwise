@@ -1,5 +1,4 @@
 import { combineReducers } from 'redux';
-import { updateUserProfileRedux } from '../reduxActions/userProfileRedux';
 import allGroupsReducer from './allGroupsReducer';
 import dashboardReducer from './dashboardReducer';
 import editGroupReducer from './editGroupReducer';
@@ -8,6 +7,7 @@ import loginReducer from './loginReducer';
 import newGroupReducer from './newGroupReducer';
 import recentActivitiesReducer from './recentActivitiesReducer';
 import signupReducer from './signupReducer';
+import userProfileReducer from './userProfileReducer';
 
 export default combineReducers({
     login: loginReducer,
@@ -17,7 +17,7 @@ export default combineReducers({
     editGroup: editGroupReducer,
     groupsInfo: groupsInfoReducer,
     newGroup: newGroupReducer,
-    updateUserProfile: updateUserProfileRedux,
+    updateUserProfile: userProfileReducer,
     recentActivities: recentActivitiesReducer
 });
 

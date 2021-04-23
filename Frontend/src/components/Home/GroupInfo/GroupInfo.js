@@ -45,7 +45,15 @@ class GroupInfo extends Component {
   onPost = async (e) => {
     e.preventDefault();
     console.log(e.target.value, e.target.id, this.state[e.target.id + ":"]);
-    await this.props.postCommentRedux({ user_id: getUserID(), expense_id: e.target.id, note: this.state[e.target.id + ":"] });
+    const targetId = e.target.id;
+    const targetIdSliced = targetId.slice(1);
+    const valueInStateForTargetId = this.state[targetIdSliced + ":"];
+    await this.props.postCommentRedux({ user_id: getUserID(), expense_id: targetIdSliced, note: valueInStateForTargetId });
+    var obj = {};
+    obj[targetIdSliced+":"] = "";
+    this.setState(obj);
+    document.getElementById(targetIdSliced).value = "";
+    console.log("trying to reset the obj", obj);
   }
 
   deleteComment = async (e) => {
@@ -133,7 +141,7 @@ class GroupInfo extends Component {
                 </Col>
                 <Col sm={1} style={{ margin: 'auto' }}>
                   <div>
-                    <img id={expense._id} onClick={(e) => {
+                    <img id={"b"+expense._id} onClick={(e) => {
                       let key = e.target.id;
                       var obj = {};
                       obj[key] = !(this.state[e.target.id]);
@@ -143,13 +151,13 @@ class GroupInfo extends Component {
                 </Col>
               </Row>
 
-              <Collapse in={this.state[expense._id]}>
+              <Collapse in={this.state["b"+expense._id]}>
                 <div style={{ padding: '0 3rem' }}>
                   <hr />
                   <div style={{ textAlign: 'center' }}>Notes and Comments</div>
                   <Row>
                   </Row>
-                  <form id={expense._id} onSubmit={this.onPost}>
+                  <form id={"f"+expense._id} onSubmit={this.onPost}>
                     {expenseNotesData}
                     <textarea id={expense._id} type="text" maxLength="150" className="form-control" name="notes" onChange={(e) => {
                       let key = e.target.id + ":"; //to denote the notes

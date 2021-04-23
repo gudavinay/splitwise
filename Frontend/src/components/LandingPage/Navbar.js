@@ -71,8 +71,8 @@ function PostLoginSnippet() {
               /></Link>
           </Col>
           <Col style={{textAlign:'right',display:'flex', justifyContent:'flex-end'}}>
-            <div><a
-              href="/home/userProfile"
+            <div><Link
+              to="/home/userProfile"
               style={{
                 margin: "1rem",
                 color: "whitesmoke",
@@ -83,7 +83,7 @@ function PostLoginSnippet() {
               }}
             >
               <div><img style={{borderRadius:'25px', height:'30px', margin:'0px 8px'}} src={profileImage} alt=""/></div><div style={{marginTop:'2px'}}>{getUserName()}</div>
-            </a></div>
+            </Link></div>
             <OverlayTrigger
               placement="bottom"
               overlay={

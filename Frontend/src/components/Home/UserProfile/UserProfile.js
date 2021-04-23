@@ -1,14 +1,13 @@
 import { Button } from 'react-bootstrap';
 import React, { Component } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { getUserEmail, getUserName, getUserPhone, getUserCurrencyDesc, getUserTimezone, getUserLanguage, getUserID, getProfilePicture } from '../../Services/ControllerUtils';
-// import store from '../../../store'
-import backendServer from '../../../webConfig'
+import { getUserEmail, getUserName, getUserPhone, getUserCurrencyDesc, getUserTimezone, getUserLanguage, getUserID, getProfilePicture, getUserProfile } from '../../Services/ControllerUtils';
+import awsConfig from '../../../awsConfig'
 import { Alert } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { updateUserProfileRedux } from '../../../reduxOps/reduxActions/userProfileRedux';
 import { uploadUserProfilePictureRedux } from '../../../reduxOps/reduxActions/newGroupRedux';
-
+import { uploadFile } from 'react-s3';
 class UserProfile extends Component {
     constructor(props) {
         super(props);
@@ -19,9 +18,10 @@ class UserProfile extends Component {
             currency: getUserCurrencyDesc(),
             language: getUserLanguage(),
             timezone: getUserTimezone(),
-            profilePicture: getProfilePicture(),
+            s3URL: getProfilePicture(),
             saveSuccess: false,
             saveFailed: false,
+            userProfile: getUserProfile()
         }
     }
 
@@ -37,16 +37,18 @@ class UserProfile extends Component {
         event.preventDefault();
         const data = {
             name: this.state.name,
-            email: this.state.email,
+            email: this.state.email.toUpperCase(),
             phone: this.state.phone,
             currency: this.state.currency,
             language: this.state.language,
             timezone: this.state.timezone,
-            profilePicture: this.state.uploadedFile,
+            profilePicture: this.state.s3URL,
             id: getUserID()
         };
         console.log(this.state);
         await this.props.updateUserProfileRedux(data);
+        localStorage.setItem("userProfile",JSON.stringify(data));
+        this.setState({userProfile:data});
         // await Axios.post(`${backendServer}/updateUserProfile`, data)
         //     .then(response => {
         //         console.log("response recieved from updateUserProfile - fetch groups req", response);
@@ -62,11 +64,7 @@ class UserProfile extends Component {
 
     componentDidUpdate(prevState) {
         if (prevState.userProfile !== this.props.userProfile) {
-            localStorage.setItem("userProfile", JSON.stringify(this.props.allUserExpenses));
             this.setState({ saveSuccess: true, saveFailed: false })
-        }
-        if(prevState.uploadedFile !== this.props.uploadedFile){
-            this.setState({uploadedFile: this.props.uploadedFile})
         }
     }
 
@@ -80,23 +78,22 @@ class UserProfile extends Component {
                                 <center>
                                     <h2>Your account</h2>
                                     {/* <img src="https://png.pngtree.com/png-vector/20191023/ourlarge/pngtree-user-vector-icon-with-white-background-png-image_1849343.jpg" style={{ height: '100%', width: '100%' }} alt="profilephoto" /> */}
-                                    <img src={backendServer + "/user/" + getProfilePicture()} style={{ height: '100%', width: '100%' }} alt="profilephoto" />
+                                    {/* Here's s3url: -- {this.state.s3URL} -- */}
+                                    <img src={this.state.s3URL} style={{ height: '100%', width: '100%' }} alt="profilephoto" />
                                     <Row style={{ marginTop: '10px' }}>
                                         <Col sm={9}>
                                             <input style={{ fontSize: '12px' }} className="form-control" type="file" name="profilepicture" accept="image/*" onChange={this.uploadImage} />
                                         </Col>
                                         <Col sm={3}>
                                             <Button onClick={async () => {
-                                                let formData = new FormData();
-                                                formData.append('myImage', this.state.file);
-                                                const config = { headers: { 'content-type': 'multipart/form-data' } };
-                                                await this.props.uploadUserProfilePictureRedux("/uploadUserProfilePicture", formData, config);
-                                                // Axios.post("/uploadUserProfilePicture", formData, config).then(response => {
-                                                //     alert("file uploaded successfully");
-                                                //     this.setState({ uploadedFile: response.data })
-                                                // }, error => {
-                                                //     // this.setState
-                                                // })
+                                                uploadFile(this.state.file, awsConfig)
+                                                    .then(data => {
+                                                        this.setState({s3URL: data.location});
+                                                    })
+                                                    .catch(err => {
+                                                        console.error(err);
+                                                        this.setState({s3URL: ""});
+                                                    })
                                             }} disabled={!this.state.file} style={{ margin: 'auto', backgroundColor: '#FF6139', borderColor: '#FF6139', fontSize: '12px' }} >Upload</Button><br />
                                         </Col>
 
@@ -329,8 +326,8 @@ const mapStateToProps = state => {
     console.log("state mapstatetoprops in UserProfile", state);
     return ({
         userProfile: state.updateUserProfile.userProfile,
-        uploadedFile : state.newGroup.uploadedFile
+        uploadedFile: state.newGroup.uploadedFile
     });
 }
 
-export default connect(mapStateToProps, { updateUserProfileRedux,uploadUserProfilePictureRedux })(UserProfile);
+export default connect(mapStateToProps, { updateUserProfileRedux, uploadUserProfilePictureRedux })(UserProfile);

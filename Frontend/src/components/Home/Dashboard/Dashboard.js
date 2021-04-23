@@ -23,9 +23,9 @@ class Dashboard extends Component {
         if(prevState.allUserExpenses !== this.props.allUserExpenses){
             this.setState({allUserExpenses: this.props.allUserExpenses})
         }
-        if(this.props.settleUp){
-            window.location.reload();
-        }
+        // if(this.props.settleUp){
+        //     window.location.reload();
+        // }
     }
 
     onSubmit = async (event) => {
@@ -35,6 +35,8 @@ class Dashboard extends Component {
             paid_to: "" + this.state.settleUpUser
         };
         await this.props.settleUpRedux(data);
+        await this.props.getAllUserExpensesRedux({ user_id: getUserID() });
+        this.setState({ show: false })
     }
 
 
@@ -59,7 +61,7 @@ class Dashboard extends Component {
                 userExpenseNames[expense.paid_to] = expense.name;
                 userExpense[expense.paid_by] = 0;
                 userExpenseTotal[expense.paid_by] = 0;
-                userExpenseNames[expense.paid_by] = expense.name;
+                userExpenseNames[expense.paid_by] = expense.paid_by_name;
             })
             this.state.allUserExpenses.forEach(expense => {
                 if (expense.paid_to === userID)

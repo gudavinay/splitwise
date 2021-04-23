@@ -39,9 +39,9 @@ class Login extends Component {
             redirectVar = <Redirect to="/home/s/dashboard" />
         }
         if (this.state.loginClicked) {
+            if (this.props.user && (this.props.user.id || this.props.user.name)) {
             var decoded = jwt_decode(this.props.user.token);
             console.log("decoded msg - login - ", decoded, this.props.user.token);
-            if (this.props.user && (this.props.user.id || this.props.user.name)) {
                 localStorage.setItem("userProfile", JSON.stringify(this.props.user));
                 redirectVar = <Redirect to="/home/s/dashboard" />
             } else {

@@ -137,10 +137,12 @@ export default function CustomPaginationActionsTable(props) {
             <TableCell component="th" scope="row">
               <Row>
                 <Col sm={1} style={{ margin: 'auto' }}>
-                  <img style={{ height: '40px' }} src={row.paid_by === 'N' ? notesSVG : settledUp} alt="" />
+                  <img style={{ height: '40px' }} src={ notesSVG } alt="" />
+                  {/* <img style={{ height: '40px' }} src={row.paid_by === 'N' ? notesSVG : settledUp} alt="" /> */}
                 </Col>
                 <Col>
-                  {row.paid_by.settled === 'N' ? (<div>
+                  {/* {row.paid_by.settled === 'N' ? (<div> */}
+                  {row.paid_by.settled !== 'N' ? (<div>
                     <strong>{row.paid_by._id === getUserID() ? "You" : row.paid_by.name}</strong> paid <strong>{userPreferredCurrency} {row.amount}</strong> for <strong>"{row.description}"</strong> in <strong>"{row.group_id.name}"</strong>.<br />
                     <span style={{ color: '#999', fontSize: '12px' }}>{getMonthFromUtils(row.created_date)} {getDateFromUtils(row.created_date)} </span>
                   </div>) : (<div>

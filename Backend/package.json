@@ -15,6 +15,7 @@
     "client-sessions": "^0.8.0",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
+    "crypto": "^1.0.1",
     "ejs": "^3.1.6",
     "express": "^4.16.3",
     "express-session": "^1.15.6",
@@ -26,6 +27,7 @@
     "mysql": "^2.18.1",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
-    "password-hash": "^1.2.2"
+    "password-hash": "^1.2.2",
+    "kafka-node": "^5.0.0"
   }
 }

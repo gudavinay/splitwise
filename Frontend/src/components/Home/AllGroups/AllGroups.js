@@ -32,6 +32,7 @@ class AllGroups extends Component {
         }
         console.log("passing in acceptRejectInvite to backend", data);
         await this.props.acceptInviteRedux(data);
+        await this.props.fetchGroupsRedux({ user_id: getUserID() });
     }
 
     async componentDidMount() {
@@ -41,9 +42,6 @@ class AllGroups extends Component {
     componentDidUpdate(prevState){
         if(prevState.groupsInfo !== this.props.groupsInfo){
             this.setState({groupsInfo: this.props.groupsInfo})
-        }
-        if(this.props.acceptInvite){
-            window.location.reload();
         }
     }
 

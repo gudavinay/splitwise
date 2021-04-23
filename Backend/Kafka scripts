@@ -2,5 +2,27 @@ Kafka scripts
 
 zookeeper-server-start /usr/local/etc/kafka/zookeeper.properties
 kafka-server-start /usr/local/etc/kafka/server.properties   
-kafka-console-producer --broker-list localhost:9092 --topic test
-kafka-console-consumer --bootstrap-server localhost:9092 --topic test --from-beginning
+kafka-console-producer --broker-list localhost:9092 --topic post_book
+kafka-console-consumer --bootstrap-server localhost:9092 --topic post_book --from-beginning
+
+kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic <TOPIC>
+
+kafka-topics --list --zookeeper localhost:2181 
+
+
+kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic signup
+kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic login
+kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic fetchUsers
+kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic newGroup
+kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic fetchGroups
+kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic acceptInvite
+kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic addExpense
+kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic getAllExpenses
+kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic getAllIndividualExpenses
+kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic getAllUserExpenses
+kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic settleUp
+kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic updateUserProfile
+kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic getAllUserExpensesForRecentActivities
+kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic exitGroup
+kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic postComment
+kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic deleteComment

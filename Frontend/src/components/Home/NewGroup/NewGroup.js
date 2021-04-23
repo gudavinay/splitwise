@@ -140,7 +140,7 @@ class NewGroup extends Component {
                                                 let userIDArray = [];
                                                 this.state.selectedList.forEach(selection=>{
                                                     this.state.fetchUsers.forEach(user =>{
-                                                        if(selection.includes(user.email)){
+                                                        if(selection.toLowerCase().includes(user.email.toLowerCase())){
                                                             if(user.rec_id)
                                                             userIDArray.push(user.rec_id);
                                                             else if(user._id)
