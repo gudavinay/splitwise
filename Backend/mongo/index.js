@@ -64,7 +64,7 @@ app.get("/", (req, res) => {
 app.post('/signup', async function (req, res) {
   kafka.make_request('signup', req.body, function (err, results) {
 
-    console.log(results);
+
     if (err) {
 
       res.json({
@@ -84,7 +84,7 @@ app.post('/login', async function (req, res) {
 
   kafka.make_request('login', req.body, function (err, results) {
 
-    console.log(results);
+
     if (err) {
 
       res.json({
@@ -105,7 +105,7 @@ app.get('/fetchUsers', checkAuth, async function (req, res) {
   console.log("fetch users");
   kafka.make_request('fetchUsers', req.body, function (err, results) {
 
-    console.log(results);
+
     if (err) {
 
       res.json({
@@ -127,7 +127,7 @@ app.get('/fetchUsers', checkAuth, async function (req, res) {
 app.post('/newGroup', checkAuth, async function (req, res) {
   kafka.make_request('newGroup', req.body, function (err, results) {
 
-    console.log(results);
+
     if (err) {
 
       res.json({
@@ -147,7 +147,7 @@ app.post('/fetchGroups', checkAuth, async function (req, res) {
   // console.log(req.body);
   kafka.make_request('fetchGroups', req.body, function (err, results) {
 
-    console.log(results);
+
     if (err) {
 
       res.json({
@@ -165,7 +165,7 @@ app.post('/fetchGroups', checkAuth, async function (req, res) {
 app.post('/acceptInvite', checkAuth, async function (req, res) {
   kafka.make_request('acceptInvite', req.body, function (err, results) {
 
-    console.log(results);
+
     if (err) {
 
       res.json({
@@ -183,7 +183,7 @@ app.post('/acceptInvite', checkAuth, async function (req, res) {
 app.post('/addExpense', checkAuth, async function (req, res) {
   kafka.make_request('addExpense', req.body, function (err, results) {
 
-    console.log(results);
+    console.log("REQUEST FOR ADD EXPENSE",req.body);
     if (err) {
 
       res.json({
@@ -202,7 +202,7 @@ app.post('/addExpense', checkAuth, async function (req, res) {
 app.post('/getAllExpenses', checkAuth, async function (req, res) {
   kafka.make_request('getAllExpenses', req.body, function (err, results) {
 
-    console.log(results);
+
     if (err) {
 
       res.json({
@@ -220,7 +220,7 @@ app.post('/getAllExpenses', checkAuth, async function (req, res) {
 app.post('/getAllIndividualExpenses', checkAuth, async function (req, res) {
   kafka.make_request('getAllIndividualExpenses', req.body, function (err, results) {
 
-    console.log(results);
+
     if (err) {
 
       res.json({
@@ -238,7 +238,7 @@ app.post('/getAllIndividualExpenses', checkAuth, async function (req, res) {
 app.post('/getAllUserExpenses', checkAuth, async function (req, res) {
   kafka.make_request('getAllUserExpenses', req.body, function (err, results) {
 
-    console.log(results);
+
     if (err) {
 
       res.json({
@@ -257,7 +257,7 @@ app.post('/getAllUserExpenses', checkAuth, async function (req, res) {
 app.post('/settleUp', checkAuth, async function (req, res) {
   kafka.make_request('settleUp', req.body, function (err, results) {
 
-    console.log(results);
+
     if (err) {
 
       res.json({
@@ -276,7 +276,7 @@ app.post('/updateUserProfile', checkAuth, async function (req, res) {
   console.log("INSIDE USERPROFILE UPDATION");
   kafka.make_request('updateUserProfile', req.body, function (err, results) {
 
-    console.log(results);
+
     if (err) {
 
       res.json({
@@ -295,7 +295,7 @@ app.post('/updateUserProfile', checkAuth, async function (req, res) {
 app.post('/getAllUserExpensesForRecentActivities', checkAuth, async function (req, res) {
   kafka.make_request('getAllUserExpensesForRecentActivities', req.body, function (err, results) {
 
-    console.log(results);
+
     if (err) {
 
       res.json({
@@ -356,7 +356,7 @@ app.post('/getAllUserExpensesForRecentActivities', checkAuth, async function (re
 app.post('/exitGroup', checkAuth, async function (req, res) {
   kafka.make_request('exitGroup', req.body, function (err, results) {
 
-    console.log(results);
+
     if (err) {
 
       res.json({
@@ -408,7 +408,8 @@ app.post('/exitGroup', checkAuth, async function (req, res) {
 app.post('/postComment', checkAuth, async function (req, res) {
   kafka.make_request('postComment', req.body, function (err, results) {
 
-    console.log(results);
+    console.log("REQUEST FOR ADD COMMENT",req.body,"COMMENT ADDED...");
+    console.log(results.notes);
     if (err) {
 
       res.json({
@@ -426,7 +427,7 @@ app.post('/postComment', checkAuth, async function (req, res) {
 app.post('/deleteComment', checkAuth, async function (req, res) {
   kafka.make_request('deleteComment', req.body, function (err, results) {
 
-    console.log(results);
+
     if (err) {
 
       res.json({

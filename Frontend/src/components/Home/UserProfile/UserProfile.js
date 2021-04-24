@@ -43,7 +43,8 @@ class UserProfile extends Component {
             language: this.state.language,
             timezone: this.state.timezone,
             profilePicture: this.state.s3URL,
-            id: getUserID()
+            id: getUserID(),
+            token: getUserProfile().token
         };
         console.log(this.state);
         await this.props.updateUserProfileRedux(data);
@@ -79,7 +80,7 @@ class UserProfile extends Component {
                                     <h2>Your account</h2>
                                     {/* <img src="https://png.pngtree.com/png-vector/20191023/ourlarge/pngtree-user-vector-icon-with-white-background-png-image_1849343.jpg" style={{ height: '100%', width: '100%' }} alt="profilephoto" /> */}
                                     {/* Here's s3url: -- {this.state.s3URL} -- */}
-                                    <img src={this.state.s3URL} style={{ height: '100%', width: '100%' }} alt="profilephoto" />
+                                    <img src={this.state.s3URL?this.state.s3URL:"https://splitwise-cmpe273.s3.amazonaws.com/defaultProfilePicture.png"}style={{ height: '100%', width: '100%' }} alt="profilephoto" />
                                     <Row style={{ marginTop: '10px' }}>
                                         <Col sm={9}>
                                             <input style={{ fontSize: '12px' }} className="form-control" type="file" name="profilepicture" accept="image/*" onChange={this.uploadImage} />

@@ -3,6 +3,8 @@ const Expenses = require('../mongo/models/expenses')
 
 function handle_request(msg, callback) {
   try {
+    console.log("REQUEST FOR ADD EXPENSE");
+  console.log(msg);
     if (msg.group_id && msg.description && msg.amount && msg.paid_by) {
       // TODO check error
       let users = [];
@@ -31,7 +33,7 @@ function handle_request(msg, callback) {
         }
         const expenses = new Expenses(data);
         expenses.save(function (err, result) {
-          console.log("added", result);
+          console.log("RESPONSE FOR ADD EXPENSE", result);
         });
         callback(null, err ? err : result);
       });
