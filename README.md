@@ -14,12 +14,17 @@
 #### Backend
  
 1. Clone the repository's backend folder "Backend" into any machine having node.js installed on it.
-2. Open the terminal in the folder "Backend".
-3. Execute "npm install" to install all the dependencies.
-4. Create a database "splitwise_db" in MySQL database server and execute the SQL dump to generate the schema.
-5. Update pool.js file in Backend folder with database name and connection details.
-6. Update the app.js file in Backend folder with frontend server's IP address and port.
-7. Execute "node index" to run the backend server.
+2. Setup Kafka and Zookeeper and create topics as mentioned in Kafka Scripts.
+3. ( Middleware SETUP)
+    a. Open the terminal in the folder "Backend/mongo".
+    b. Execute "npm install" to install all the dependencies.
+    c. Update the connection.js/config.js with frontend server's IP address and port.
+    d. Execute "node index" to run the backend server.
+4. ( Kafka Backend SETUP)
+    a. Open the terminal in the folder "Backend/kafka-backend".
+    b. Execute "npm install" to install all the dependencies.
+    c. Update the connection.js with frontend server's IP address and port.
+    d. Execute "node server" to run the backend server.
  
 #### Launch the application
  
